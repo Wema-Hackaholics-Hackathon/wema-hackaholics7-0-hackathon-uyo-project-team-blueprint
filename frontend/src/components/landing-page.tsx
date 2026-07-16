@@ -8,7 +8,7 @@ const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const trustItems = [
   {
     icon: Storefront,
-    title: "Built for petty traders",
+    title: "Built for micro-SMEs",
     body: "Made for market sellers, okada riders, and shop owners, not accountants.",
   },
   {
@@ -64,7 +64,7 @@ export function LandingPage() {
             {...fadeUp(0)}
             className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground md:text-5xl"
           >
-            The smarter way for petty traders to see, track, and prove their daily
+            The smarter way for micro-SMEs to see, track, and prove their daily
             business.
           </motion.h1>
 
@@ -100,27 +100,29 @@ export function LandingPage() {
           </motion.div>
         </section>
 
-        {/* TODO: replace this placeholder with a real product image — a photo of a
-            Nigerian petty trader using Traka, or a clean screenshot of the app
-            dashboard. Drop the file in /public (e.g. /public/landing-hero.jpg)
-            and swap the block below for:
-            <img src="/landing-hero.jpg" alt="..." className="w-full rounded-3xl shadow-card object-cover" />
-        */}
-        <motion.div
-          {...fadeUp(0.24)}
-          className="mx-auto max-w-3xl px-6"
-        >
-          <div className="flex aspect-[16/10] w-full items-center justify-center rounded-3xl border border-dashed border-primary/30 bg-gradient-to-br from-primary/[0.06] to-background shadow-card">
-            <div className="px-6 text-center">
-              <p className="font-display text-base font-semibold text-foreground">
-                Product image
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Add a photo of a trader using Traka, or an app screenshot.
-              </p>
+        {/*
+          Product image section — temporarily commented out.
+          TODO: replace this placeholder with a real product image — a photo of a
+          Nigerian micro-SME using Traka, or a clean screenshot of the app
+          dashboard. Drop the file in /public (e.g. /public/landing-hero.jpg)
+          and swap the block below for:
+          <img src="/landing-hero.jpg" alt="..." className="w-full rounded-3xl shadow-card object-cover" />
+          <motion.div
+            {...fadeUp(0.24)}
+            className="mx-auto max-w-3xl px-6"
+          >
+            <div className="flex aspect-[16/10] w-full items-center justify-center rounded-3xl border border-dashed border-primary/30 bg-gradient-to-br from-primary/[0.06] to-background shadow-card">
+              <div className="px-6 text-center">
+                <p className="font-display text-base font-semibold text-foreground">
+                  Product image
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Add a photo of a micro-SME owner using Traka, or an app screenshot.
+                </p>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        */}
 
         <section className="mx-auto max-w-2xl px-6 pb-20 pt-16">
           <div className="grid grid-cols-1 gap-8">

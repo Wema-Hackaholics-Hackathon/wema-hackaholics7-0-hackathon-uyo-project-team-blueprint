@@ -1,4 +1,4 @@
-# Traka — Smarter bookkeeping for Nigeria's petty traders
+# Traka — Smarter bookkeeping for Nigeria's micro-SMEs
 
 ## Team Members
 
