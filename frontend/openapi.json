@@ -1,0 +1,1265 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Traka API", "version": "0.1.0" },
+  "paths": {
+    "/accounts/signup": {
+      "post": {
+        "tags": ["accounts"],
+        "summary": "Signup",
+        "description": "Create a new account with business name, phone number, nin, and a 6-digit pin.",
+        "operationId": "signup_accounts_signup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccountCreate" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AccountResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/login": {
+      "post": {
+        "tags": ["accounts"],
+        "summary": "Login",
+        "description": "Authenticate an account using phone number and pin.\nReturns access token, refresh token, and the generated virtual account number.",
+        "operationId": "login_accounts_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccountLogin" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/me": {
+      "get": {
+        "tags": ["accounts"],
+        "summary": "Get Me",
+        "description": "Return the profile of the currently authenticated account holder.",
+        "operationId": "get_me_accounts_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AccountMeResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/inventory": {
+      "get": {
+        "tags": ["inventory"],
+        "summary": "Get Products",
+        "operationId": "get_products_inventory_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/ProductResponse" },
+                  "type": "array",
+                  "title": "Response Get Products Inventory Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["inventory"],
+        "summary": "Create Product",
+        "operationId": "create_product_inventory_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductCreate" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/inventory/{product_id}": {
+      "put": {
+        "tags": ["inventory"],
+        "summary": "Update Product",
+        "operationId": "update_product_inventory__product_id__put",
+        "security": [{ "HTTPBearer": [] }],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Product Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["inventory"],
+        "summary": "Delete Product",
+        "operationId": "delete_product_inventory__product_id__delete",
+        "security": [{ "HTTPBearer": [] }],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Product Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory/extract-product": {
+      "post": {
+        "tags": ["inventory"],
+        "summary": "Extract Product",
+        "description": "Extracts the product name from up to 3 uploaded images using Gemini AI.\nThe images are discarded immediately and not saved to the database.",
+        "operationId": "extract_product_inventory_extract_product_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_extract_product_inventory_extract_product_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductExtractionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/debtors/all": {
+      "get": {
+        "tags": ["debtors"],
+        "summary": "Get Debtors",
+        "operationId": "get_debtors_debtors_all_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebtorsSummaryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/debtors/new": {
+      "post": {
+        "tags": ["debtors"],
+        "summary": "Create Debtor",
+        "operationId": "create_debtor_debtors_new_post",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "dummy-account-id",
+              "title": "Account Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DebtorCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DebtorResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/debtors/{debtor_id}/link": {
+      "get": {
+        "tags": ["debtors"],
+        "summary": "Get Debtor Link",
+        "operationId": "get_debtor_link_debtors__debtor_id__link_get",
+        "parameters": [
+          {
+            "name": "debtor_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Debtor Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DebtorLinkResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/debtors/{debtor_id}/settle": {
+      "post": {
+        "tags": ["debtors"],
+        "summary": "Settle Debt",
+        "operationId": "settle_debt_debtors__debtor_id__settle_post",
+        "security": [{ "HTTPBearer": [] }],
+        "parameters": [
+          {
+            "name": "debtor_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Debtor Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/cash-sale": {
+      "post": {
+        "tags": ["transactions"],
+        "summary": "Log Cash Sale",
+        "description": "Logs a cash sale directly — no inbound transfer required.\nCreates a reconciled Transaction immediately from the basket.\nRevenue and profit are computed from product selling/cost prices.",
+        "operationId": "log_cash_sale_transactions_cash_sale_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CashSaleRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnallocatedTransactionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/transactions": {
+      "get": {
+        "tags": ["transactions"],
+        "summary": "List Transactions",
+        "description": "Returns all transactions for the authenticated merchant, newest first.",
+        "operationId": "list_transactions_transactions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UnallocatedTransactionResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Transactions Transactions Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/transactions/unallocated": {
+      "get": {
+        "tags": ["transactions"],
+        "summary": "List Unallocated",
+        "description": "Returns only unallocated (pending reconciliation) transactions.",
+        "operationId": "list_unallocated_transactions_unallocated_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UnallocatedTransactionResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Unallocated Transactions Unallocated Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/transactions/reconcile-unallocated": {
+      "post": {
+        "tags": ["transactions"],
+        "summary": "Reconcile Unallocated",
+        "description": "Called when the merchant taps Confirm on the Transfer Received modal.\n\n- reconciliation_type \"sale\" → items basket required (product_id + quantity)\n- reconciliation_type \"debt\" → debtor_id + repayment_amount required",
+        "operationId": "reconcile_unallocated_transactions_reconcile_unallocated_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReconcileRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnallocatedTransactionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/activity/recent": {
+      "get": {
+        "tags": ["Activity"],
+        "summary": "Get Recent Activity",
+        "operationId": "get_recent_activity_activity_recent_get",
+        "security": [{ "HTTPBearer": [] }],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityLogResponse"
+                  },
+                  "title": "Response Get Recent Activity Activity Recent Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "tags": ["notifications"],
+        "summary": "Get Notifications",
+        "operationId": "get_notifications_notifications_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Notifications Notifications Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/reports/dashboard": {
+      "get": {
+        "tags": ["reports"],
+        "summary": "Get Dashboard",
+        "description": "Live dashboard totals. Call this on page load and again after every\nConfirm action (cash sale or reconcile-unallocated) to refresh the\nrevenue and profit cards.",
+        "operationId": "get_dashboard_reports_dashboard_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DashboardResponse" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/reports/weekly": {
+      "get": {
+        "tags": ["reports"],
+        "summary": "Get Weekly Report",
+        "description": "Returns Weekly Reports & Insights for the authenticated merchant.\n\nCovers:\n- Revenue & Profit cards with % change vs last week\n- Daily Sales Pattern (Mon–Sun bar chart data)\n- Stock Performance: fastest-selling product\n- Stock Alert Status: items at or below low_stock_threshold\n- Debtors summary: total outstanding + unpaid count",
+        "operationId": "get_weekly_report_reports_weekly_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyReportResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/webhooks/bank-settlement": {
+      "post": {
+        "tags": ["webhooks"],
+        "summary": "Bank Settlement",
+        "description": "Receives inward settlement events (mock only for now).\nCreates an unallocated Transaction record against the matched merchant account.\nSignature verification is intentionally skipped until a real gateway is wired in.",
+        "operationId": "bank_settlement_webhooks_bank_settlement_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/simulation/trigger-transfer": {
+      "post": {
+        "tags": ["simulation"],
+        "summary": "Trigger Transfer",
+        "description": "Simulates an inward bank transfer against a merchant virtual account.\nInternally mirrors a Paystack charge.success webhook payload and routes it\nthrough the settlement ingestion pipeline, creating an unallocated\nTransaction record and triggering the SSE broadcast.",
+        "operationId": "trigger_transfer_simulation_trigger_transfer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriggerTransferPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Read Root",
+        "operationId": "read_root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountCreate": {
+        "properties": {
+          "business_name": { "type": "string", "title": "Business Name" },
+          "phone_number": { "type": "string", "title": "Phone Number" },
+          "nin": { "type": "string", "title": "Nin" },
+          "pin": {
+            "type": "string",
+            "maxLength": 6,
+            "minLength": 6,
+            "pattern": "^[0-9]{6}$",
+            "title": "Pin",
+            "description": "6 digit PIN"
+          }
+        },
+        "type": "object",
+        "required": ["business_name", "phone_number", "nin", "pin"],
+        "title": "AccountCreate"
+      },
+      "AccountLogin": {
+        "properties": {
+          "phone_number": { "type": "string", "title": "Phone Number" },
+          "pin": { "type": "string", "title": "Pin" }
+        },
+        "type": "object",
+        "required": ["phone_number", "pin"],
+        "title": "AccountLogin"
+      },
+      "AccountMeResponse": {
+        "properties": {
+          "id": { "type": "string", "title": "Id" },
+          "business_name": { "type": "string", "title": "Business Name" },
+          "phone_number": { "type": "string", "title": "Phone Number" },
+          "virtual_account_number": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Virtual Account Number"
+          }
+        },
+        "type": "object",
+        "required": ["id", "business_name", "phone_number"],
+        "title": "AccountMeResponse"
+      },
+      "AccountResponse": {
+        "properties": {
+          "id": { "type": "string", "title": "Id" },
+          "business_name": { "type": "string", "title": "Business Name" },
+          "phone_number": { "type": "string", "title": "Phone Number" },
+          "nin": { "type": "string", "title": "Nin" },
+          "virtual_account_number": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Virtual Account Number"
+          },
+          "access_token": { "type": "string", "title": "Access Token" },
+          "refresh_token": { "type": "string", "title": "Refresh Token" }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "business_name",
+          "phone_number",
+          "nin",
+          "access_token",
+          "refresh_token"
+        ],
+        "title": "AccountResponse"
+      },
+      "ActivityLogResponse": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "account_id": { "type": "string", "title": "Account Id" },
+          "activity_type": { "type": "string", "title": "Activity Type" },
+          "title": { "type": "string", "title": "Title" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "event_metadata": {
+            "anyOf": [{}, { "type": "null" }],
+            "title": "Event Metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "account_id",
+          "activity_type",
+          "title",
+          "description",
+          "event_metadata",
+          "created_at"
+        ],
+        "title": "ActivityLogResponse"
+      },
+      "BasketItem": {
+        "properties": {
+          "product_id": { "type": "string", "title": "Product Id" },
+          "quantity": { "type": "integer", "title": "Quantity" }
+        },
+        "type": "object",
+        "required": ["product_id", "quantity"],
+        "title": "BasketItem"
+      },
+      "Body_extract_product_inventory_extract_product_post": {
+        "properties": {
+          "images": {
+            "items": {
+              "type": "string",
+              "contentMediaType": "application/octet-stream"
+            },
+            "type": "array",
+            "title": "Images",
+            "description": "Upload up to 3 images"
+          }
+        },
+        "type": "object",
+        "required": ["images"],
+        "title": "Body_extract_product_inventory_extract_product_post"
+      },
+      "CashSaleRequest": {
+        "properties": {
+          "sender_name": { "type": "string", "title": "Sender Name" },
+          "items": {
+            "items": { "$ref": "#/components/schemas/BasketItem" },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": ["sender_name", "items"],
+        "title": "CashSaleRequest"
+      },
+      "DailySalesEntry": {
+        "properties": {
+          "day": { "type": "string", "title": "Day" },
+          "amount": { "type": "number", "title": "Amount" }
+        },
+        "type": "object",
+        "required": ["day", "amount"],
+        "title": "DailySalesEntry"
+      },
+      "DashboardResponse": {
+        "properties": {
+          "total_revenue": { "type": "number", "title": "Total Revenue" },
+          "total_profit": { "type": "number", "title": "Total Profit" },
+          "today_revenue": { "type": "number", "title": "Today Revenue" },
+          "today_profit": { "type": "number", "title": "Today Profit" },
+          "total_debt_outstanding": {
+            "type": "number",
+            "title": "Total Debt Outstanding"
+          },
+          "unpaid_debtor_count": {
+            "type": "integer",
+            "title": "Unpaid Debtor Count"
+          },
+          "low_stock_count": { "type": "integer", "title": "Low Stock Count" }
+        },
+        "type": "object",
+        "required": [
+          "total_revenue",
+          "total_profit",
+          "today_revenue",
+          "today_profit",
+          "total_debt_outstanding",
+          "unpaid_debtor_count",
+          "low_stock_count"
+        ],
+        "title": "DashboardResponse"
+      },
+      "DebtorCreate": {
+        "properties": {
+          "name": { "type": "string", "title": "Name" },
+          "amount": { "type": "number", "title": "Amount" },
+          "items_summary": { "type": "string", "title": "Items Summary" },
+          "due_date": {
+            "anyOf": [
+              { "type": "string", "format": "date" },
+              { "type": "null" }
+            ],
+            "title": "Due Date"
+          },
+          "items": {
+            "items": { "$ref": "#/components/schemas/DebtorItemCreate" },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": ["name", "amount", "items_summary", "items"],
+        "title": "DebtorCreate"
+      },
+      "DebtorItemCreate": {
+        "properties": {
+          "product_name": { "type": "string", "title": "Product Name" },
+          "qty": { "type": "integer", "title": "Qty" },
+          "price": { "type": "number", "title": "Price" }
+        },
+        "type": "object",
+        "required": ["product_name", "qty", "price"],
+        "title": "DebtorItemCreate"
+      },
+      "DebtorItemResponse": {
+        "properties": {
+          "product_name": { "type": "string", "title": "Product Name" },
+          "qty": { "type": "integer", "title": "Qty" },
+          "price": { "type": "number", "title": "Price" },
+          "id": { "type": "integer", "title": "Id" },
+          "debtor_id": { "type": "string", "title": "Debtor Id" }
+        },
+        "type": "object",
+        "required": ["product_name", "qty", "price", "id", "debtor_id"],
+        "title": "DebtorItemResponse"
+      },
+      "DebtorLinkResponse": {
+        "properties": { "link": { "type": "string", "title": "Link" } },
+        "type": "object",
+        "required": ["link"],
+        "title": "DebtorLinkResponse"
+      },
+      "DebtorResponse": {
+        "properties": {
+          "id": { "type": "string", "title": "Id" },
+          "account_id": { "type": "string", "title": "Account Id" },
+          "name": { "type": "string", "title": "Name" },
+          "amount": { "type": "number", "title": "Amount" },
+          "items_summary": { "type": "string", "title": "Items Summary" },
+          "due_date": {
+            "anyOf": [
+              { "type": "string", "format": "date" },
+              { "type": "null" }
+            ],
+            "title": "Due Date"
+          },
+          "status": { "type": "string", "title": "Status" },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "items": {
+            "items": { "$ref": "#/components/schemas/DebtorItemResponse" },
+            "type": "array",
+            "title": "Items",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "account_id",
+          "name",
+          "amount",
+          "items_summary",
+          "due_date",
+          "status",
+          "created_at"
+        ],
+        "title": "DebtorResponse"
+      },
+      "DebtorsSummaryResponse": {
+        "properties": {
+          "total_outstanding": {
+            "type": "number",
+            "title": "Total Outstanding"
+          },
+          "debtors": {
+            "items": { "$ref": "#/components/schemas/DebtorResponse" },
+            "type": "array",
+            "title": "Debtors"
+          }
+        },
+        "type": "object",
+        "required": ["total_outstanding", "debtors"],
+        "title": "DebtorsSummaryResponse"
+      },
+      "FastestSellingProduct": {
+        "properties": {
+          "product_id": { "type": "string", "title": "Product Id" },
+          "product_name": { "type": "string", "title": "Product Name" },
+          "badge": { "type": "string", "title": "Badge" }
+        },
+        "type": "object",
+        "required": ["product_id", "product_name", "badge"],
+        "title": "FastestSellingProduct"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LowStockItem": {
+        "properties": {
+          "product_id": { "type": "string", "title": "Product Id" },
+          "product_name": { "type": "string", "title": "Product Name" },
+          "quantity": { "type": "integer", "title": "Quantity" },
+          "low_stock_threshold": {
+            "type": "integer",
+            "title": "Low Stock Threshold"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id",
+          "product_name",
+          "quantity",
+          "low_stock_threshold"
+        ],
+        "title": "LowStockItem"
+      },
+      "NotificationResponse": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "title": { "type": "string", "title": "Title" },
+          "message": { "type": "string", "title": "Message" },
+          "is_read": { "type": "boolean", "title": "Is Read" },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": ["id", "title", "message", "is_read", "created_at"],
+        "title": "NotificationResponse"
+      },
+      "ProductCreate": {
+        "properties": {
+          "name": { "type": "string", "title": "Name" },
+          "cost_price": { "type": "number", "title": "Cost Price" },
+          "selling_price": { "type": "number", "title": "Selling Price" },
+          "quantity": { "type": "integer", "title": "Quantity" },
+          "low_stock_threshold": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Low Stock Threshold",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "required": ["name", "cost_price", "selling_price", "quantity"],
+        "title": "ProductCreate"
+      },
+      "ProductExtractionResponse": {
+        "properties": { "name": { "type": "string", "title": "Name" } },
+        "type": "object",
+        "required": ["name"],
+        "title": "ProductExtractionResponse"
+      },
+      "ProductResponse": {
+        "properties": {
+          "id": { "type": "string", "title": "Id" },
+          "account_id": { "type": "string", "title": "Account Id" },
+          "name": { "type": "string", "title": "Name" },
+          "cost_price": { "type": "number", "title": "Cost Price" },
+          "selling_price": { "type": "number", "title": "Selling Price" },
+          "quantity": { "type": "integer", "title": "Quantity" },
+          "low_stock_threshold": {
+            "type": "integer",
+            "title": "Low Stock Threshold"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "account_id",
+          "name",
+          "cost_price",
+          "selling_price",
+          "quantity",
+          "low_stock_threshold",
+          "created_at"
+        ],
+        "title": "ProductResponse"
+      },
+      "ProductUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Name"
+          },
+          "cost_price": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Cost Price"
+          },
+          "selling_price": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Selling Price"
+          },
+          "quantity": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Quantity"
+          },
+          "low_stock_threshold": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Low Stock Threshold"
+          }
+        },
+        "type": "object",
+        "title": "ProductUpdate"
+      },
+      "ReconcileRequest": {
+        "properties": {
+          "transaction_reference": {
+            "type": "string",
+            "title": "Transaction Reference"
+          },
+          "reconciliation_type": {
+            "type": "string",
+            "enum": ["sale", "debt"],
+            "title": "Reconciliation Type"
+          },
+          "items": {
+            "anyOf": [
+              {
+                "items": { "$ref": "#/components/schemas/BasketItem" },
+                "type": "array"
+              },
+              { "type": "null" }
+            ],
+            "title": "Items"
+          },
+          "debtor_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Debtor Id"
+          },
+          "repayment_amount": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Repayment Amount"
+          }
+        },
+        "type": "object",
+        "required": ["transaction_reference", "reconciliation_type"],
+        "title": "ReconcileRequest"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": { "type": "string", "title": "Access Token" },
+          "refresh_token": { "type": "string", "title": "Refresh Token" },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "virtual_account_number": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Virtual Account Number"
+          }
+        },
+        "type": "object",
+        "required": ["access_token", "refresh_token"],
+        "title": "TokenResponse"
+      },
+      "TriggerTransferPayload": {
+        "properties": {
+          "sender_name": { "type": "string", "title": "Sender Name" },
+          "simulated_amount": { "type": "number", "title": "Simulated Amount" },
+          "virtual_account_target": {
+            "type": "string",
+            "title": "Virtual Account Target"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sender_name",
+          "simulated_amount",
+          "virtual_account_target"
+        ],
+        "title": "TriggerTransferPayload"
+      },
+      "UnallocatedTransactionResponse": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "reference": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Reference"
+          },
+          "sender_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Sender Name"
+          },
+          "amount": { "type": "number", "title": "Amount" },
+          "channel": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Channel"
+          },
+          "status": { "type": "string", "title": "Status" },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "sender_name",
+          "amount",
+          "channel",
+          "status",
+          "created_at"
+        ],
+        "title": "UnallocatedTransactionResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" },
+          "input": { "title": "Input" },
+          "ctx": { "type": "object", "title": "Context" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      },
+      "WeeklyReportResponse": {
+        "properties": {
+          "period": { "type": "string", "title": "Period" },
+          "week_start": { "type": "string", "title": "Week Start" },
+          "week_end": { "type": "string", "title": "Week End" },
+          "revenue": { "type": "number", "title": "Revenue" },
+          "revenue_change": { "type": "number", "title": "Revenue Change" },
+          "profit": { "type": "number", "title": "Profit" },
+          "profit_change": { "type": "number", "title": "Profit Change" },
+          "daily_sales": {
+            "items": { "$ref": "#/components/schemas/DailySalesEntry" },
+            "type": "array",
+            "title": "Daily Sales"
+          },
+          "fastest_selling": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/FastestSellingProduct" },
+              { "type": "null" }
+            ]
+          },
+          "low_stock_items": {
+            "items": { "$ref": "#/components/schemas/LowStockItem" },
+            "type": "array",
+            "title": "Low Stock Items"
+          },
+          "total_debt_outstanding": {
+            "type": "number",
+            "title": "Total Debt Outstanding"
+          },
+          "unpaid_debtor_count": {
+            "type": "integer",
+            "title": "Unpaid Debtor Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period",
+          "week_start",
+          "week_end",
+          "revenue",
+          "revenue_change",
+          "profit",
+          "profit_change",
+          "daily_sales",
+          "low_stock_items",
+          "total_debt_outstanding",
+          "unpaid_debtor_count"
+        ],
+        "title": "WeeklyReportResponse"
+      }
+    },
+    "securitySchemes": { "HTTPBearer": { "type": "http", "scheme": "bearer" } }
+  }
+}

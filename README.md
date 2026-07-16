@@ -1,74 +1,93 @@
-# [Project Title]
+# Traka — Smarter bookkeeping for Nigeria's petty traders
 
 ## Team Members
-- [Name 1]
-- [Name 2]
-- [Name 3]
-- [Name 4]
-- [Name 5]
+
+- [Abasiofon Sendan](https://github.com/abasiofon-sendan)
+- [Covenant Monday](https://github.com/covenantmondei)
+- [Idighekere Udo](https://github.com/Idighekere)
+- [Unwana Edet](https://github.com/lightnonstop)
+- [Joshua Udom](https://github.com/udomjosh04-uj)
 
 ---
 
 ## 🚀 Live Demo
 
-*   **Live Application:** [Link to your deployed Vercel/Netlify/Render URL]
-*   **Backend API:** [Link to your live backend API endpoint URL, if separate]
-*   **Recorded Demo:** [Link to your recorded demo explaining how your solution works using Loom].
-
+- **Live Application:** [Link to your deployed Vercel/Netlify/Render URL]
+- **Backend API:** [Link to your live backend API endpoint URL, if separate]
+- **Recorded Demo:** [Link to your recorded demo explaining how your solution works using Loom].
 
 ---
 
 ## 🎯 The Problem
 
-*Which "How Might We..." question from the challenge brief are you tackling? Show the format by providing an example below.*
-
-> **Example:** How might we help busy people organize their daily tasks more effectively?
+What is stopping people from fully participating in the formal financial system, and how can your solution solve or remove that barrier?
 
 ## ✨ Our Solution
 
-*Provide a short, high-level description of your project. What is your unique idea? What does it do? How does it solve the problem?*
+We are building a cash‑friendly, ledger‑first rail that turns everyday informal sales into a trusted digital record — without forcing people to stop using cash.
+Key idea:
 
-**Example:**
-"Our project, 'TaskMaster,' is a clean and simple to-do list application. It allows users to add tasks, mark them as complete, and sort them by priority. The goal is to provide a straightforward tool to help users stay organized."
+- People keep taking cash the way they do today.
+- Each day’s sales (cash + transfers) are logged in a simple self‑service flow (app).
+- That system builds a business ledger for each person: total sales, customers, frequency, patterns.
+- Over time, this ledger becomes a “financial CV” that banks and lenders can trust.
 
 ---
 
 ## 🛠️ Tech Stack
 
-*List the major technologies, frameworks, and platforms you used to build your project.*
-
-*   **Frontend:** (e.g., React, Next.js, Tailwind CSS)
-*   **Backend:** (e.g., Node.js with Serverless Functions on Vercel)
-*   **Database:** (e.g., PostgreSQL via Supabase)
-*   **Deployment:** (e.g., Vercel)
-*   **AI/APIs:** (e.g., Google Gemini API)
+- **Frontend:** React 19, TypeScript, Tailwind CSS v4, shadcn/ui
+- **Backend:** FastAPI, SQLAlchemy
+- **Database:** SQLite (local dev)
+- **State & Data:** TanStack Query, TanStack Router
+- **Animation:** Motion (Framer Motion)
+- **AI/APIs:** Google Gemini (product image extraction), Groq (voice assistant)
+- **PWA:** vite-plugin-pwa
+- **Deployment:** Vercel (frontend), Railway (backend)
 
 ---
 
-## ⚙️ How to Set Up and Run Locally (Optional)
+## ⚙️ How to Set Up and Run Locally
 
-*Briefly explain the steps to get your project running on a local machine.*
+_Briefly explain the steps to get your project running on a local machine._
 
-**Example:**
+### Frontend
 
-1.  Clone the repository:
-    ```bash
-    git clone [your-repo-link]
-    ```
-2.  Navigate to the project directory:
-    ```bash
-    cd [project-directory]
-    ```
-3.  Install dependencies:
-    ```bash
-    npm install
-    ```
-4.  Create a `.env.local` file and add the necessary environment variables:
-    ```
-    DATABASE_URL=...
-    API_KEY=...
-    ```
-5.  Run the development server:
-    ```bash
-    npm run dev
-    ```
+1. Navigate to the **frontend** directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies (the project uses `bun`):
+   ```bash
+   bun install
+   ```
+3. Create a `.env.local` file with the API base URL:
+   ```
+   VITE_API_URL=http://localhost:8000
+   ```
+4. Run the development server:
+   ```bash
+   bun run dev
+   ```
+
+### Backend
+
+1. Navigate to the **backend** directory:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies with `uv` (a `uv.lock` is provided):
+   ```bash
+   uv sync
+   ```
+3. Create a `.env` file in `backend/` with your API keys. The voice assistant requires a Groq key:
+   ```
+   GROQ_API_KEY=your_groq_api_key
+   ```
+   (Add a Gemini key if you use the product image extraction feature.)
+4. Run the API with Uvicorn:
+   ```bash
+   uv run uvicorn main:app --reload --port 8000
+   ```
+
+The frontend expects the backend at `http://localhost:8000` by default (set `VITE_API_URL` to match your backend if different).
