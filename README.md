@@ -1,18 +1,18 @@
-# [Project Title]
+# [TRAKA]
 
 ## Team Members
-- [Name 1]
-- [Name 2]
-- [Name 3]
-- [Name 4]
-- [Name 5]
+- [Abasiofon Sendan]
+- [Idighekere Udo]
+- [Joshua Udom]
+- [Covenant Monday]
+- [Unwana Edet]
 
 ---
 
 ## 🚀 Live Demo
 
 *   **Live Application:** [Link to your deployed Vercel/Netlify/Render URL]
-*   **Backend API:** [Link to your live backend API endpoint URL, if separate]
+*   **Backend API:** [https://traka-backend-production.up.railway.app/]
 *   **Recorded Demo:** [Link to your recorded demo explaining how your solution works using Loom].
 
 
@@ -20,9 +20,8 @@
 
 ## 🎯 The Problem
 
-*Which "How Might We..." question from the challenge brief are you tackling? Show the format by providing an example below.*
 
-> **Example:** How might we help busy people organize their daily tasks more effectively?
+> What is stopping people from fully participating in the formal financial system, and how can your solution solve or remove that barrier?
 
 ## ✨ Our Solution
 
