@@ -41,6 +41,7 @@ interface AppContextValue {
   openCollectDebt: (id: number) => void;
   openIncomingTransfer: () => void;
   triggerBatchScan: (files: FileList | null) => void;
+  addStagedProduct: (name?: string) => void;
   updateStagedField: (idx: number, field: keyof StagedProduct, value: string | number) => void;
   commitBatch: () => void;
   discardBatch: () => void;
@@ -282,6 +283,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setActiveStagedIdx(0);
   }, [pushNotification]);
 
+  const addStagedProduct = useCallback((name = "") => {
+    const placeholderImg = "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=150&auto=format&fit=crop&q=60";
+    const idx = stagedProducts.length;
+    setStagedProducts((prev) => [
+      ...prev,
+      { name, qty: 1, cost: 0, selling: 0, img: placeholderImg },
+    ]);
+    setActiveStagedIdx(idx);
+  }, [stagedProducts]);
+
   const updateStagedField = useCallback((idx: number, field: keyof StagedProduct, value: string | number) => {
     setStagedProducts((prev) =>
       prev.map((p, i) => (i === idx ? { ...p, [field]: value } : p)),
@@ -382,7 +393,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setAuthenticated, setActiveStagedIdx, setAiLang, setActiveModal, closeModal,
       pushNotification, handleAuth, simulateTransfer, manualCashSale, processTransfer,
       logDebt, settleDebt, openSettleConfirm, openCollectDebt, openIncomingTransfer,
-      triggerBatchScan, updateStagedField,
+      triggerBatchScan, addStagedProduct, updateStagedField,
       commitBatch, discardBatch, submitAiQuery, submitAiVoice,
     }}>
       {children}

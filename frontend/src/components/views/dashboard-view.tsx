@@ -8,6 +8,7 @@ import {
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { OnboardingEmptyState } from "@/components/views/onboarding-empty-state";
 import type { InventoryItem } from "@/store/types";
 import { useState } from "react";
 
@@ -74,80 +75,86 @@ export function DashboardView({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <MetricCard
-          label="Today's Revenue"
-          value={`₦${revenue.toLocaleString()}`}
-          icon={Wallet}
-          color="text-primary"
-        />
-        <MetricCard
-          label="Estimated Profit"
-          value={`₦${profit.toLocaleString()}`}
-          icon={TrendUp}
-          color="text-primary"
-        />
-      </div>
+      {inventory.length === 0 ? (
+        <OnboardingEmptyState />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <MetricCard
+              label="Today's Revenue"
+              value={`₦${revenue.toLocaleString()}`}
+              icon={Wallet}
+              color="text-primary"
+            />
+            <MetricCard
+              label="Estimated Profit"
+              value={`₦${profit.toLocaleString()}`}
+              icon={TrendUp}
+              color="text-primary"
+            />
+          </div>
 
-      <div className="space-y-3 rounded-2xl border border-border bg-card/40 p-4">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          Record Sales Transactions
-        </h4>
-        <div className="grid grid-cols-2 gap-3">
-          <ActionCard
-            icon={Bank}
-            label="Incoming Transfer"
-            desc="Simulate digital bank notification hook"
-            iconBg="bg-primary/10"
-            iconColor="text-primary"
-            hoverBorder="hover:border-primary/30"
-            onClick={onSimulateTransfer}
-          />
-          <ActionCard
-            icon={CurrencyNgn}
-            label="Record Cash Sale"
-            desc="Manually input hard cash collected"
-            iconBg="bg-primary/10"
-            iconColor="text-primary"
-            hoverBorder="hover:border-primary/30"
-            onClick={onOpenCashModal}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Live Inventory Highlight
-          </h4>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={onNavigateInventory}
-            className="text-xs"
-          >
-            View All
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {topTwo.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-xs"
-            >
-              <div>
-                <p className="font-bold text-card-foreground">{item.name}</p>
-                <p className="mt-0.5 text-[10px] text-muted-foreground">
-                  Stock Left: {item.qty} units
-                </p>
-              </div>
-              <span className="rounded-md bg-background px-2 py-1 font-semibold text-muted-foreground">
-                ₦{item.selling}
-              </span>
+          <div className="space-y-3 rounded-2xl border border-border bg-card/40 p-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Record Sales Transactions
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              <ActionCard
+                icon={Bank}
+                label="Incoming Transfer"
+                desc="Simulate digital bank notification hook"
+                iconBg="bg-primary/10"
+                iconColor="text-primary"
+                hoverBorder="hover:border-primary/30"
+                onClick={onSimulateTransfer}
+              />
+              <ActionCard
+                icon={CurrencyNgn}
+                label="Record Cash Sale"
+                desc="Manually input hard cash collected"
+                iconBg="bg-primary/10"
+                iconColor="text-primary"
+                hoverBorder="hover:border-primary/30"
+                onClick={onOpenCashModal}
+              />
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Live Inventory Highlight
+              </h4>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={onNavigateInventory}
+                className="text-xs"
+              >
+                View All
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {topTwo.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-xs"
+                >
+                  <div>
+                    <p className="font-bold text-card-foreground">{item.name}</p>
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">
+                      Stock Left: {item.qty} units
+                    </p>
+                  </div>
+                  <span className="rounded-md bg-background px-2 py-1 font-semibold text-muted-foreground">
+                    ₦{item.selling}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
