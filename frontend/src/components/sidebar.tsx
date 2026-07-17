@@ -4,6 +4,7 @@ import {
   ChartLineUp,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { useApp } from "@/store/app-context";
 
 interface SidebarProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onClose, onOpenCredit, onOpenReports }: SidebarProps) {
+  const { accountName } = useApp();
   return (
     <div
       className={`absolute left-0 top-0 z-50 flex h-full w-72 flex-col justify-between border-r border-border bg-card p-6 transition-transform duration-300 ease-in-out ${
@@ -58,7 +60,7 @@ export function Sidebar({ open, onClose, onOpenCredit, onOpenReports }: SidebarP
           Active Merchant
         </p>
         <p className="mt-0.5 text-sm font-bold text-foreground">
-          Dele Provision Stores
+          {accountName || "Your Store"}
         </p>
         <p className="mt-1 flex items-center text-xs text-primary">
           <span className="mr-1.5 h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />

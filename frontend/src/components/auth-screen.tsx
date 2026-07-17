@@ -1,7 +1,8 @@
-import { ChartLineUp, Lock, Phone, Storefront, Fingerprint } from "@phosphor-icons/react";
+import { ChartLineUp, Lock, Phone, Storefront, Fingerprint, ArrowRight } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { cn, primaryCta } from "@/lib/utils";
 import { accountsApi } from "@/lib/endpoints";
 import { useToast } from "@/components/ui/toast";
 
@@ -98,7 +99,7 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
     }
   };
   return (
-    <div className="flex flex-1 flex-col justify-center px-6">
+    <div className="flex flex-1 flex-col justify-center px-6 pt-16">
       {/* Brand */}
       <div className="mb-8 text-center">
         <div className="mx-auto mb-3 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-3xl text-primary">
@@ -185,14 +186,15 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
             />
           </Field>
           {error && <p className="text-center text-xs font-medium text-destructive">{error}</p>}
-          <Button
-            variant="default"
+          <button
+            type="button"
             onClick={handleSignup}
             disabled={!canSignup || loading}
-            className="mt-2 w-full cursor-pointer rounded-xl bg-primary px-4 py-4 font-bold text-primary-foreground transition-transform active:scale-[0.98] disabled:opacity-40"
+            className={cn(primaryCta, "mt-2 w-full cursor-pointer disabled:opacity-40")}
           >
             {loading ? "Creating Account..." : "Create My Traka Account"}
-          </Button>
+            <ArrowRight weight="bold" className="h-4 w-4" />
+          </button>
         </div>
       )}
 
@@ -223,14 +225,15 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
             />
           </Field>
           {error && <p className="text-center text-xs font-medium text-destructive">{error}</p>}
-          <Button
-            variant="default"
+          <button
+            type="button"
             onClick={handleLogin}
             disabled={!canLogin || loading}
-            className="mt-2 w-full cursor-pointer rounded-xl bg-primary px-4 py-4 font-bold text-primary-foreground transition-transform active:scale-[0.98] disabled:opacity-40"
+            className={cn(primaryCta, "mt-2 w-full cursor-pointer disabled:opacity-40")}
           >
             {loading ? "Logging In..." : "Log In to My Account"}
-          </Button>
+            <ArrowRight weight="bold" className="h-4 w-4" />
+          </button>
         </div>
       )}
     </div>
