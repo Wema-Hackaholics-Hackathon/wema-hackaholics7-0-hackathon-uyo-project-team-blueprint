@@ -8,6 +8,14 @@ import { AppProvider } from "@/store/app-context";
 import { ToastProvider } from "@/components/ui/toast";
 import "./index.css";
 
+(() => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      for (const reg of regs) reg.unregister();
+    });
+  }
+})();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

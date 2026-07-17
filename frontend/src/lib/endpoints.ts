@@ -126,6 +126,16 @@ export interface WeeklyReportResponse {
   unpaid_debtor_count: number;
 }
 
+export interface DashboardResponse {
+  total_revenue: number;
+  total_profit: number;
+  today_revenue: number;
+  today_profit: number;
+  total_debt_outstanding: number;
+  unpaid_debtor_count: number;
+  low_stock_count: number;
+}
+
 export interface FastestSellingProduct {
   product_id: string;
   product_name: string;
@@ -283,6 +293,8 @@ export const activityApi = {
 /* ─── Reports ─── */
 
 export const reportsApi = {
+  dashboard: () =>
+    api.get<DashboardResponse>("/reports/dashboard").then((r) => r.data),
   weekly: () =>
     api.get<WeeklyReportResponse>("/reports/weekly").then((r) => r.data),
 };

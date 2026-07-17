@@ -25,7 +25,7 @@ export const queryKeys = {
   debtors: { all: ["debtors"] as const },
   notifications: { all: ["notifications"] as const },
   activity: { recent: ["activity", "recent"] as const },
-  reports: { weekly: ["reports", "weekly"] as const },
+  reports: { weekly: ["reports", "weekly"] as const, dashboard: ["reports", "dashboard"] as const },
 };
 
 /* ─── Account ─── */
@@ -185,6 +185,16 @@ export function useWeeklyReport(enabled = true) {
     queryKey: queryKeys.reports.weekly,
     queryFn: () => reportsApi.weekly(),
     enabled,
+    refetchInterval: 30_000,
+  });
+}
+
+export function useDashboard(enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.reports.dashboard,
+    queryFn: () => reportsApi.dashboard(),
+    enabled,
+    refetchInterval: 15_000,
   });
 }
 

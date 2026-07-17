@@ -24,7 +24,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => {
     if (res.config.method !== 'get') {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["reports", "dashboard"] });
     }
     return res;
   },

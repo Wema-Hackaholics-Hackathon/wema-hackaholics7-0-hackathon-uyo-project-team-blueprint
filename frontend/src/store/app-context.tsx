@@ -3,7 +3,7 @@ import type { InventoryItem, DebtorEntry, DebtorItem, PaidDebt, Notification, St
 import { debtorsApi, inventoryApi, voiceApi, type AiLanguage } from "@/lib/endpoints";
 import { getErrorMessage } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
-import { useInventory, useDebtors, useWeeklyReport, useMe } from "@/lib/query-hooks";
+import { useInventory, useDebtors, useDashboard, useMe } from "@/lib/query-hooks";
 import { queryClient } from "@/lib/query-client";
 
 interface AppContextValue {
@@ -13,6 +13,9 @@ interface AppContextValue {
   bankName: string;
   revenue: number;
   profit: number;
+  totalDebt: number;
+  unpaidDebtorCount: number;
+  lowStockCount: number;
   inventory: InventoryItem[];
   debtors: DebtorEntry[];
   paidDebts: PaidDebt[];
@@ -65,7 +68,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const { data: meData, isError: meError } = useMe(authenticated);
   const { data: inventoryData } = useInventory(authenticated);
   const { data: debtorsData } = useDebtors(authenticated);
-  const { data: weeklyData } = useWeeklyReport(authenticated);
+  const { data: dashboardData } = useDashboard(authenticated);
 
   useEffect(() => {
     if (meError) setAuthenticated(false);
@@ -81,8 +84,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const accountName = meData?.business_name ?? "";
   const accountNumber = meData?.virtual_account_number ?? "";
   const bankName = "Wema Bank";
-  const revenue = weeklyData?.revenue ?? 0;
-  const profit = weeklyData?.profit ?? 0;
+  const revenue = dashboardData?.today_revenue ?? 0;
+  const profit = dashboardData?.today_profit ?? 0;
+  const totalDebt = dashboardData?.total_debt_outstanding ?? 0;
+  const unpaidDebtorCount = dashboardData?.unpaid_debtor_count ?? 0;
+  const lowStockCount = dashboardData?.low_stock_count ?? 0;
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [debtors, setDebtors] = useState<DebtorEntry[]>([]);
@@ -431,6 +437,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       authenticated, accountName, accountNumber, bankName, revenue, profit,
+      totalDebt, unpaidDebtorCount, lowStockCount,
       inventory, debtors, paidDebts, stagedProducts,
       activeStagedIdx, scanning, chatLogs, aiChips, aiLang, aiLoading, activeModal,
       incomingTransferAmount, incomingTransferSender, incomingTransferBank,
