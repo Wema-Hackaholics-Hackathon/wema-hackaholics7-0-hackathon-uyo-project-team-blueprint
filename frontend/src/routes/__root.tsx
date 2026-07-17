@@ -1,5 +1,5 @@
 import { createRootRoute, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { List, Bell, Sparkle } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/sidebar";
@@ -10,11 +10,14 @@ import { ReportsDrawer } from "@/components/modals/reports-drawer";
 import { Modals } from "@/components/modals";
 import { useApp } from "@/store/app-context";
 import { useWeeklyReport } from "@/lib/query-hooks";
+import { useToast } from "@/components/ui/toast";
+import { playChime } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 
 function RootLayout() {
-  const { authenticated, notifications, aiLang, setAiLang, aiLoading, chatLogs, aiChips, submitAiQuery, submitAiVoice } = useApp();
+  const { authenticated, notifications, aiLang, setAiLang, aiLoading, chatLogs, aiChips, submitAiQuery, submitAiVoice, receiveIncomingTransfer } = useApp();
   const { data: weeklyData } = useWeeklyReport();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,6 +27,37 @@ function RootLayout() {
 
   const isNotifPage = location.pathname === "/notifications";
   const isLanding = location.pathname === "/";
+  const isSandbox = location.pathname === "/sandbox";
+
+  // Listen for demo "incoming transfer" broadcasts sent from the secret
+  // /sandbox simulator so the merchant dashboard can react in real time.
+  useEffect(() => {
+    if (isSandbox) return;
+    const channel = new BroadcastChannel("traka_demo_channel");
+    channel.onmessage = (e: MessageEvent) => {
+      const data = e.data;
+      if (!data || data.type !== "INCOMING_TRANSFER") return;
+      const amount = Number(data.amount);
+      const sender = String(data.sender ?? "Unknown Sender");
+      const bank = String(data.bank ?? "Unknown Bank");
+      playChime();
+      toast({
+        title: "Transfer Alert",
+        description: `₦${amount.toLocaleString()} received from ${sender}!`,
+        variant: "default",
+      });
+      receiveIncomingTransfer({ amount, sender, bank });
+    };
+    return () => channel.close();
+  }, [isSandbox, toast, receiveIncomingTransfer]);
+
+  if (isSandbox) {
+    return (
+      <main className="min-h-screen w-full bg-slate-100 text-slate-900">
+        <Outlet />
+      </main>
+    );
+  }
 
   return (
     <div

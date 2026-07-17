@@ -37,6 +37,8 @@ interface IncomingTransferModalProps {
   onClose: () => void;
   inventory: InventoryItem[];
   incomingAmount: number;
+  sender?: string;
+  bank?: string;
   onConfirm: (basket: BasketItem[]) => void;
 }
 
@@ -45,6 +47,8 @@ export function IncomingTransferModal({
   onClose,
   inventory,
   incomingAmount,
+  sender,
+  bank,
   onConfirm,
 }: IncomingTransferModalProps) {
   const [basket, setBasket] = useState<BasketItem[]>([]);
@@ -139,6 +143,12 @@ export function IncomingTransferModal({
             <p className="mt-1.5 font-mono text-3xl font-black tracking-tight text-foreground">
               ₦{incomingAmount.toLocaleString()}
             </p>
+            {sender && (
+              <p className="mt-2 text-xs font-semibold text-muted-foreground">
+                {sender}
+                {bank && <span className="text-muted-foreground/70"> · {bank}</span>}
+              </p>
+            )}
           </div>
 
           <div className="mb-4 space-y-3 rounded-2xl border border-border bg-card p-4">

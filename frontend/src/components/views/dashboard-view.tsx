@@ -21,6 +21,7 @@ interface DashboardViewProps {
   onSimulateTransfer: () => void;
   onOpenCashModal: () => void;
   onNavigateInventory: () => void;
+  onAddProduct: (name?: string) => void;
 }
 
 export function DashboardView({
@@ -32,6 +33,7 @@ export function DashboardView({
   onSimulateTransfer,
   onOpenCashModal,
   onNavigateInventory,
+  onAddProduct,
 }: DashboardViewProps) {
   const topTwo = inventory.slice(0, 2);
   const [copied, setCopied] = useState(false);
@@ -76,7 +78,7 @@ export function DashboardView({
       </div>
 
       {inventory.length === 0 ? (
-        <OnboardingEmptyState />
+        <OnboardingEmptyState onAddProduct={onAddProduct} />
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3">

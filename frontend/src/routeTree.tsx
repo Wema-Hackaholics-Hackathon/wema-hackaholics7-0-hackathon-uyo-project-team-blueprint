@@ -7,6 +7,7 @@ import { Route as InventoryRoute } from "@/routes/inventory";
 import { Route as DebtorsRoute } from "@/routes/debtors";
 import { Route as NotificationsRoute } from "@/routes/notifications";
 import { Route as InsightsRoute } from "@/routes/insights";
+import { Route as SandboxRoute } from "@/routes/sandbox";
 
 const routeTree = RootRoute.addChildren([
   IndexRoute,
@@ -16,6 +17,7 @@ const routeTree = RootRoute.addChildren([
   DebtorsRoute,
   NotificationsRoute,
   InsightsRoute,
+  SandboxRoute,
 ]);
 
 export const router = createRouter({ routeTree });

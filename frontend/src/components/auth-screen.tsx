@@ -1,8 +1,8 @@
-import { ChartLineUp, Lock, Phone, Storefront, Fingerprint, ArrowRight } from "@phosphor-icons/react";
+import { ChartLineUp, Lock, Phone, Storefront, Fingerprint, ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { cn, primaryCta } from "@/lib/utils";
+import { cn, primaryCta, getErrorMessage } from "@/lib/utils";
 import { accountsApi } from "@/lib/endpoints";
 import { useToast } from "@/components/ui/toast";
 
@@ -22,6 +22,8 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
   const [loginPhone, setLoginPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSignupPin, setShowSignupPin] = useState(false);
+  const [showLoginPin, setShowLoginPin] = useState(false);
 
   const isValidNigerianPhone = (p: string) => /^(07|08|09)\d{9}$/.test(p);
   const canSignup = signupName.trim() && isValidNigerianPhone(signupPhone) && signupNin.length === 11 && signupPin.length === 6;
@@ -57,7 +59,7 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
       toast({ title: "Account Created", description: "Welcome to Traka! Setting up your ledger...", variant: "success" });
       onAuthenticate();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Signup failed. Please try again.";
+      const msg = getErrorMessage(err, "Signup failed. Please try again.");
       setError(msg);
       toast({ title: "Signup Failed", description: msg, variant: "destructive" });
     } finally {
@@ -91,7 +93,7 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
       toast({ title: "Welcome Back", description: "Logging into your ledger...", variant: "success" });
       onAuthenticate();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Login failed. Please try again.";
+      const msg = getErrorMessage(err, "Login failed. Please try again.");
       setError(msg);
       toast({ title: "Login Failed", description: msg, variant: "destructive" });
     } finally {
@@ -174,16 +176,26 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
             />
           </Field>
           <Field label="Create PIN" icon={Lock}>
-            <Input
-              type="password"
-              inputMode="numeric"
-              autoComplete="new-password"
-              placeholder="6-digit PIN"
-              maxLength={6}
-              value={signupPin}
-              onChange={(e) => setSignupPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary"
-            />
+            <div className="relative">
+              <Input
+                type={showSignupPin ? "text" : "password"}
+                inputMode="numeric"
+                autoComplete="new-password"
+                placeholder="6-digit PIN"
+                maxLength={6}
+                value={signupPin}
+                onChange={(e) => setSignupPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="w-full rounded-xl border border-border bg-card px-4 py-3 pr-11 text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={() => setShowSignupPin((v) => !v)}
+                aria-label={showSignupPin ? "Hide PIN" : "Show PIN"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {showSignupPin ? <EyeSlash weight="bold" className="h-5 w-5" /> : <Eye weight="bold" className="h-5 w-5" />}
+              </button>
+            </div>
           </Field>
           {error && <p className="text-center text-xs font-medium text-destructive">{error}</p>}
           <button
@@ -213,16 +225,26 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
             />
           </Field>
           <Field label="PIN" icon={Lock}>
-            <Input
-              type="password"
-              inputMode="numeric"
-              autoComplete="current-password"
-              placeholder="6-digit PIN"
-              maxLength={6}
-              value={loginPin}
-              onChange={(e) => setLoginPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary"
-            />
+            <div className="relative">
+              <Input
+                type={showLoginPin ? "text" : "password"}
+                inputMode="numeric"
+                autoComplete="current-password"
+                placeholder="6-digit PIN"
+                maxLength={6}
+                value={loginPin}
+                onChange={(e) => setLoginPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="w-full rounded-xl border border-border bg-card px-4 py-3 pr-11 text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={() => setShowLoginPin((v) => !v)}
+                aria-label={showLoginPin ? "Hide PIN" : "Show PIN"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {showLoginPin ? <EyeSlash weight="bold" className="h-5 w-5" /> : <Eye weight="bold" className="h-5 w-5" />}
+              </button>
+            </div>
           </Field>
           {error && <p className="text-center text-xs font-medium text-destructive">{error}</p>}
           <button

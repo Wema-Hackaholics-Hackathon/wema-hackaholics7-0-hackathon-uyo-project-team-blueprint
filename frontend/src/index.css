@@ -9,10 +9,10 @@
 
 @theme {
   /* ──────────────────────────────────────────────
-     Fonts
-     ────────────────────────────────────────────── */
-  --font-display: "Neue Plak", sans-serif;
-  --font-sans: "Jakarta", sans-serif;
+      Fonts
+      ────────────────────────────────────────────── */
+  --font-display: "Neue Plak", "Geist Variable", sans-serif;
+  --font-sans: "Jakarta", "Geist Variable", sans-serif;
 
   /* ──────────────────────────────────────────────
      Border Radii
@@ -24,8 +24,8 @@
   /* ──────────────────────────────────────────────
      Shadows
      ────────────────────────────────────────────── */
-  --shadow-card: 0px 4px 10px 0px rgba(0, 0, 0, 0.08);
-  --shadow-modal: 0px -4px 10px 0px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0px 4px 10px 0px rgba(29, 78, 216, 0.08);
+  --shadow-modal: 0px -4px 10px 0px rgba(29, 78, 216, 0.05);
 
   /* ──────────────────────────────────────────────
      Charcoal & Vibrant Cobalt — shadcn tokens
@@ -76,6 +76,13 @@
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-info: #3b82f6;
+
+  --animate-float: float 3.6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
 }
 
 @layer base {
@@ -107,6 +114,10 @@
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@utility grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @theme inline {

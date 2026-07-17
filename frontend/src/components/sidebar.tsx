@@ -49,7 +49,7 @@ export function Sidebar({ open, onClose, onOpenCredit, onOpenReports }: SidebarP
             onClick={() => { onOpenReports(); onClose(); }}
             className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-medium text-muted-foreground transition-colors hover:bg-secondary"
           >
-            <ChartLineUp weight="fill" className="h-5 w-5 text-emerald-600" />
+            <ChartLineUp weight="fill" className="h-5 w-5 text-primary" />
             <span>Weekly Reports</span>
           </button>
         </div>

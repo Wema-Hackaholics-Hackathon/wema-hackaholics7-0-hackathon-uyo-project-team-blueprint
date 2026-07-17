@@ -4,7 +4,7 @@ import { DashboardView } from "@/components/views/dashboard-view";
 import { useApp } from "@/store/app-context";
 
 function DashboardPage() {
-  const { revenue, profit, inventory, accountName, accountNumber, openIncomingTransfer, setActiveModal } = useApp();
+  const { revenue, profit, inventory, accountName, accountNumber, openIncomingTransfer, setActiveModal, addStagedProduct } = useApp();
   const navigate = useNavigate();
 
   return (
@@ -17,6 +17,7 @@ function DashboardPage() {
       onSimulateTransfer={openIncomingTransfer}
       onOpenCashModal={() => setActiveModal("manual-cash")}
       onNavigateInventory={() => navigate({ to: "/inventory" })}
+      onAddProduct={addStagedProduct}
     />
   );
 }

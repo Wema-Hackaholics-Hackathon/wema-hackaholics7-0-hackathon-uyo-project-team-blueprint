@@ -12,8 +12,9 @@
 
 ## 🚀 Live Demo
 
-- **Live Application:** [Link to your deployed Vercel/Netlify/Render URL]
-- **Backend API:** [Link to your live backend API endpoint URL, if separate]
+- **Live Application:** https://traka-app.vercel.app
+- **Backend API:** https://traka-backend-production.up.railway.app
+- **API Docs:** https://traka-backend-production.up.railway.app/docs
 - **Recorded Demo:** [Link to your recorded demo explaining how your solution works using Loom].
 
 ---

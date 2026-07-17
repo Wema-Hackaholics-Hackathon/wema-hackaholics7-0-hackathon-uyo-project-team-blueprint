@@ -17,6 +17,8 @@ export function Modals() {
     settleTarget,
     collectTarget,
     incomingTransferAmount,
+    incomingTransferSender,
+    incomingTransferBank,
     accountName,
     accountNumber,
     bankName,
@@ -30,6 +32,8 @@ export function Modals() {
         onClose={closeModal}
         inventory={inventory}
         incomingAmount={incomingTransferAmount}
+        sender={incomingTransferSender}
+        bank={incomingTransferBank}
         onConfirm={(basket) => {
           basket.forEach(({ prodId, qty }) => processTransfer(prodId, qty));
         }}

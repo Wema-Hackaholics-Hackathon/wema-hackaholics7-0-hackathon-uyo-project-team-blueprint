@@ -1,18 +1,20 @@
 import { Package, PlayCircle, ArrowRight } from "@phosphor-icons/react";
 import { useNavigate } from "@tanstack/react-router";
-import { useApp } from "@/store/app-context";
 import { useToast } from "@/components/ui/toast";
 import { cn, primaryCta } from "@/lib/utils";
 
 const QUICK_ITEMS = ["Peak Milk Tin", "Spaghetti Packet", "Loaf of Bread"];
 
-export function OnboardingEmptyState() {
-  const { addStagedProduct } = useApp();
+interface OnboardingEmptyStateProps {
+  onAddProduct: (name?: string) => void;
+}
+
+export function OnboardingEmptyState({ onAddProduct }: OnboardingEmptyStateProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const goAdd = (name?: string) => {
-    addStagedProduct(name);
+    onAddProduct(name);
     navigate({ to: "/inventory" });
   };
 
