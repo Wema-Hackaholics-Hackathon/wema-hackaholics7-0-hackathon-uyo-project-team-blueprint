@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { X, UserPlus, Trash, ShoppingCart, Plus } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ interface LogDebtModalProps {
 export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtModalProps) {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [selectedQty, setSelectedQty] = useState("1");
   const [creditBasket, setCreditBasket] = useState<CreditBasketItem[]>([]);
@@ -41,7 +42,7 @@ export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtMod
 
   const handleAddToBasket = () => {
     if (!selectedProductId) return;
-    const product = inventory.find((p) => p.id === Number(selectedProductId));
+    const product = inventory.find((p) => p.id === selectedProductId);
     if (!product) return;
     const qty = Math.max(1, parseInt(selectedQty) || 1);
 
@@ -67,7 +68,7 @@ export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtMod
     setSelectedQty("1");
   };
 
-  const handleRemoveFromBasket = (inventoryId: number) => {
+  const handleRemoveFromBasket = (inventoryId: string) => {
     setCreditBasket((prev) => prev.filter((b) => b.inventoryId !== inventoryId));
   };
 
@@ -87,12 +88,7 @@ export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtMod
       items,
     );
 
-    // Reset all state
-    setName("");
-    setDate("");
-    setSelectedProductId("");
-    setSelectedQty("1");
-    setCreditBasket([]);
+    handleClose();
   };
 
   const handleClose = () => {
@@ -141,10 +137,17 @@ export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtMod
                 payment due date
               </span>
               <Input
+                ref={dateInputRef}
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full border-destructive py-2.5"
+                className="w-full border-destructive py-2.5 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                onPointerDown={(e) => {
+                  if (dateInputRef.current?.showPicker) {
+                    e.stopPropagation();
+                    dateInputRef.current.showPicker();
+                  }
+                }}
               />
             </div>
 
@@ -153,23 +156,25 @@ export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtMod
               <p className="mb-2.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 Add Items to Credit
               </p>
-              <div className="flex items-center gap-2">
-                <Select
-                  value={selectedProductId}
-                  onValueChange={setSelectedProductId}
-                >
-                  <SelectTrigger className="h-9 flex-1 rounded-lg border-border bg-card text-[11px]">
-                    <SelectValue placeholder="Select product…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {inventory.map((p) => (
-                      <SelectItem key={p.id} value={String(p.id)}>
-                        {p.name} — ₦{p.selling.toLocaleString()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
+              <Select
+                value={selectedProductId}
+                onValueChange={setSelectedProductId}
+              >
+                <SelectTrigger className="h-9 flex-1 rounded-lg border-border bg-card text-[11px]">
+                  <SelectValue placeholder="Select product…" />
+                </SelectTrigger>
+                  <SelectContent noPortal>
+                  {inventory.map((p) => (
+                    <SelectItem key={p.id} value={String(p.id)}>
+                      {p.name} — ₦{p.selling.toLocaleString()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <form
+                onSubmit={(e) => { e.preventDefault(); handleAddToBasket(); }}
+                className="mt-2.5 flex items-center gap-2"
+              >
                 <Input
                   type="number"
                   min={1}
@@ -179,17 +184,16 @@ export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtMod
                 />
 
                 <Button
-                  type="button"
+                  type="submit"
                   variant="destructive"
                   size="sm"
-                  onClick={handleAddToBasket}
                   disabled={!selectedProductId}
                   className="h-9 shrink-0 rounded-lg px-3 text-[11px] font-bold"
                 >
                   <Plus weight="bold" className="h-3 w-3" />
                   Add
                 </Button>
-              </div>
+              </form>
             </div>
 
             {/* Basket List */}
