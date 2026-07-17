@@ -24,7 +24,7 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
   const [error, setError] = useState("");
 
   const isValidNigerianPhone = (p: string) => /^(07|08|09)\d{9}$/.test(p);
-  const canSignup = signupName.trim() && isValidNigerianPhone(signupPhone) && signupNin.length >= 11 && signupPin.length === 6;
+  const canSignup = signupName.trim() && isValidNigerianPhone(signupPhone) && signupNin.length === 11 && signupPin.length === 6;
   const canLogin = isValidNigerianPhone(loginPhone) && loginPin.length === 6;
 
   const handleSignup = async () => {
@@ -154,9 +154,11 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
           <Field label="Phone Number" icon={Phone}>
             <Input
               type="tel"
+              inputMode="numeric"
               placeholder="08012345678"
+              maxLength={11}
               value={signupPhone}
-              onChange={(e) => setSignupPhone(e.target.value.replace(/\D/g, ""))}
+              onChange={(e) => setSignupPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
               className="w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary"
             />
           </Field>
@@ -167,7 +169,7 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
               placeholder="11-digit NIN"
               maxLength={11}
               value={signupNin}
-              onChange={(e) => setSignupNin(e.target.value.replace(/\D/g, ""))}
+              onChange={(e) => setSignupNin(e.target.value.replace(/\D/g, "").slice(0, 11))}
               className="w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary"
             />
           </Field>
@@ -192,9 +194,11 @@ export function AuthScreen({ authTab, onSetAuthTab, onAuthenticate }: AuthScreen
           <Field label="Phone Number" icon={Phone}>
             <Input
               type="tel"
+              inputMode="numeric"
               placeholder="Enter your registered phone number"
+              maxLength={11}
               value={loginPhone}
-              onChange={(e) => setLoginPhone(e.target.value.replace(/\D/g, ""))}
+              onChange={(e) => setLoginPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
               className="w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary"
             />
           </Field>
