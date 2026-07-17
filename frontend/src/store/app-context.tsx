@@ -3,7 +3,7 @@ import type { InventoryItem, DebtorEntry, DebtorItem, PaidDebt, Notification, St
 import { debtorsApi, inventoryApi, voiceApi, type AiLanguage } from "@/lib/endpoints";
 import { getErrorMessage } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
-import { useInventory, useDebtors, useNotifications, useWeeklyReport, useMe } from "@/lib/query-hooks";
+import { useInventory, useDebtors, useWeeklyReport, useMe } from "@/lib/query-hooks";
 import { queryClient } from "@/lib/query-client";
 
 interface AppContextValue {
@@ -16,7 +16,6 @@ interface AppContextValue {
   inventory: InventoryItem[];
   debtors: DebtorEntry[];
   paidDebts: PaidDebt[];
-  notifications: Notification[];
   stagedProducts: StagedProduct[];
   activeStagedIdx: number;
   scanning: boolean;
@@ -66,7 +65,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const { data: meData, isError: meError } = useMe(authenticated);
   const { data: inventoryData } = useInventory(authenticated);
   const { data: debtorsData } = useDebtors(authenticated);
-  const { data: notificationsData } = useNotifications(authenticated);
   const { data: weeklyData } = useWeeklyReport(authenticated);
 
   useEffect(() => {
@@ -89,7 +87,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [debtors, setDebtors] = useState<DebtorEntry[]>([]);
   const [paidDebts, setPaidDebts] = useState<PaidDebt[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     if (inventoryData) {
@@ -119,18 +116,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [debtorsData]);
 
-  useEffect(() => {
-    if (notificationsData) {
-      setNotifications(notificationsData.map((n) => ({
-        id: n.id,
-        title: n.title,
-        desc: n.message,
-        type: "system" as Notification["type"],
-        time: n.created_at,
-      })));
-    }
-  }, [notificationsData]);
-
   const [stagedProducts, setStagedProducts] = useState<StagedProduct[]>([]);
   const [activeStagedIdx, setActiveStagedIdx] = useState(0);
   const [scanning, setScanning] = useState(false);
@@ -153,12 +138,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [settleTarget, setSettleTarget] = useState<DebtorEntry | null>(null);
   const [collectTarget, setCollectTarget] = useState<DebtorEntry | null>(null);
 
-  const pushNotification = useCallback((title: string, desc: string, type: Notification["type"]) => {
-    setNotifications((prev) => [
-      { id: Date.now(), title, desc, type, time: "Just Now" },
-      ...prev,
-    ]);
-  }, []);
+  const pushNotification = useCallback((title: string, desc: string, _type: Notification["type"]) => {
+    toast({ title, description: desc, variant: "default" as const });
+  }, [toast]);
 
   const handleAuth = useCallback(() => {
     setAuthenticated(true);
@@ -342,24 +324,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const commitBatch = useCallback(async () => {
     if (stagedProducts.length === 0) return;
-    try {
-      for (const s of stagedProducts) {
-        await inventoryApi.create({
+    const createdIds: string[] = [];
+    let allSucceeded = true;
+    for (const s of stagedProducts) {
+      try {
+        const created = await inventoryApi.create({
           name: s.name,
           cost_price: s.cost,
           selling_price: s.selling,
           quantity: s.qty,
         });
+        createdIds.push(created.id);
+      } catch {
+        allSucceeded = false;
+        break;
       }
-    } catch (err) {
-      toast({ title: "Batch Save Failed", description: getErrorMessage(err, "Could not save products to server. Saved locally."), variant: "destructive" });
+    }
+    if (!allSucceeded) {
+      toast({ title: "Batch Save Failed", description: "Could not save products to server. Saved locally.", variant: "destructive" });
     }
     setInventory((prev) => {
       const maxNum = prev.reduce((m, i) => Math.max(m, Number(i.id) || 0), 0);
       return [
         ...prev,
         ...stagedProducts.map((s, i) => ({
-          id: `p-local-${maxNum + i + 1}`,
+          id: allSucceeded ? createdIds[i]! : `p-local-${maxNum + i + 1}`,
           name: s.name,
           qty: s.qty,
           cost: s.cost,
@@ -441,7 +430,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       authenticated, accountName, accountNumber, bankName, revenue, profit,
-      inventory, debtors, paidDebts, notifications, stagedProducts,
+      inventory, debtors, paidDebts, stagedProducts,
       activeStagedIdx, scanning, chatLogs, aiChips, aiLang, aiLoading, activeModal,
       incomingTransferAmount, incomingTransferSender, incomingTransferBank,
       settleTarget, collectTarget,
