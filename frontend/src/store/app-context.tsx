@@ -56,11 +56,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return !!localStorage.getItem("traka_user");
   });
 
-  const { data: meData } = useMe();
+  const { data: meData, isError: meError } = useMe(authenticated);
   const { data: inventoryData } = useInventory();
   const { data: debtorsData } = useDebtors();
   const { data: notificationsData } = useNotifications();
   const { data: weeklyData } = useWeeklyReport();
+
+  useEffect(() => {
+    if (meError) setAuthenticated(false);
+  }, [meError]);
+
+  useEffect(() => {
+    const onUnauthorized = () => setAuthenticated(false);
+    window.addEventListener("traka:unauthorized", onUnauthorized);
+    return () => window.removeEventListener("traka:unauthorized", onUnauthorized);
+  }, []);
 
   const accountName = meData?.business_name ?? "";
   const accountNumber = meData?.virtual_account_number ?? "";

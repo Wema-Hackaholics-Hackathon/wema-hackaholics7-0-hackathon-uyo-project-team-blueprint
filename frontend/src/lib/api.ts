@@ -21,7 +21,7 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem("traka_user");
-      window.location.href = "/";
+      window.dispatchEvent(new Event("traka:unauthorized"));
     }
     return Promise.reject(err);
   },

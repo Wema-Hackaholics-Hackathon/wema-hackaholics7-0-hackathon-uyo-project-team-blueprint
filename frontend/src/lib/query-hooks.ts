@@ -185,9 +185,11 @@ export function useReconcile() {
 
 /* ─── Me ─── */
 
-export function useMe() {
+export function useMe(enabled = true) {
   return useQuery({
     queryKey: queryKeys.me,
     queryFn: () => accountsApi.me(),
+    enabled,
+    retry: false,
   });
 }
