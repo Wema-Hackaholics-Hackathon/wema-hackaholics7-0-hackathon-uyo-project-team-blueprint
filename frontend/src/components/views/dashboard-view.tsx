@@ -5,6 +5,8 @@ import {
   TrendUp,
   Copy,
   Check,
+  HandCoins,
+  Package,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,6 +17,9 @@ import { useState } from "react";
 interface DashboardViewProps {
   revenue: number;
   profit: number;
+  totalDebt: number;
+  unpaidDebtorCount: number;
+  lowStockCount: number;
   inventory: InventoryItem[];
   accountName: string;
   accountNumber: string;
@@ -27,6 +32,9 @@ interface DashboardViewProps {
 export function DashboardView({
   revenue,
   profit,
+  totalDebt,
+  unpaidDebtorCount,
+  lowStockCount,
   inventory,
   accountName,
   accountNumber,
@@ -96,6 +104,22 @@ export function DashboardView({
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <MetricCard
+              label="Outstanding Debt"
+              value={`₦${totalDebt.toLocaleString()}`}
+              subtitle={unpaidDebtorCount > 0 ? `${unpaidDebtorCount} debtor${unpaidDebtorCount !== 1 ? "s" : ""}` : undefined}
+              icon={HandCoins}
+              color="text-rose-500"
+            />
+            <MetricCard
+              label="Low Stock Items"
+              value={String(lowStockCount)}
+              icon={Package}
+              color="text-amber-500"
+            />
+          </div>
+
           <div className="space-y-3 rounded-2xl border border-border bg-card/40 p-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Record Sales Transactions
@@ -161,11 +185,12 @@ export function DashboardView({
   );
 }
 
-function MetricCard({ label, value, icon: Icon, color }: { label: string; value: string; icon: React.ElementType; color: string }) {
+function MetricCard({ label, value, subtitle, icon: Icon, color }: { label: string; value: string; subtitle?: string; icon: React.ElementType; color: string }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card to-background p-4">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <h3 className="mt-1 text-xl font-black text-foreground">{value}</h3>
+      {subtitle && <p className="text-[10px] font-medium text-muted-foreground">{subtitle}</p>}
       <Icon weight="fill" className={`absolute -bottom-2 -right-2 text-4xl opacity-5 ${color}`} />
     </div>
   );

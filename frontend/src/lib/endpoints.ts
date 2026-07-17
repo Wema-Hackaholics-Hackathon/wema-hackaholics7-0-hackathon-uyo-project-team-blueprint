@@ -112,39 +112,60 @@ export interface NotificationResponse {
 }
 
 export interface WeeklyReportResponse {
+  period: string;
+  week_start: string;
+  week_end: string;
+  revenue: number;
+  revenue_change: number;
+  profit: number;
+  profit_change: number;
+  daily_sales: DailySalesEntry[];
+  fastest_selling: FastestSellingProduct | null;
+  low_stock_items: LowStockItem[];
+  total_debt_outstanding: number;
+  unpaid_debtor_count: number;
+}
+
+export interface DashboardResponse {
   total_revenue: number;
   total_profit: number;
-  total_sales: number;
-  fastest_selling: FastestSellingProduct[];
-  low_stock: LowStockItem[];
-  daily_sales: DailySalesEntry[];
+  today_revenue: number;
+  today_profit: number;
+  total_debt_outstanding: number;
+  unpaid_debtor_count: number;
+  low_stock_count: number;
 }
 
 export interface FastestSellingProduct {
   product_id: string;
-  name: string;
-  quantity_sold: number;
+  product_name: string;
+  badge: string;
 }
 
 export interface LowStockItem {
   product_id: string;
-  name: string;
+  product_name: string;
   quantity: number;
-  threshold: number;
+  low_stock_threshold: number;
 }
 
 export interface DailySalesEntry {
-  date: string;
-  revenue: number;
-  profit: number;
-  transaction_count: number;
+  day: string;
+  amount: number;
 }
 
 export interface UnallocatedTransactionResponse {
-  id: string;
+  id: number;
+  reference: string | null;
+  sender_name: string | null;
   amount: number;
-  sender: string;
-  session_id: string;
+  channel: string | null;
+  status: string;
+  title: string | null;
+  details: string | null;
+  profit: number | null;
+  payment_method: string | null;
+  transaction_type: string | null;
   created_at: string;
 }
 
@@ -224,7 +245,7 @@ export const inventoryApi = {
 
 export const transactionsApi = {
   list: () =>
-    api.get<BasketItem[]>("/transactions").then((r) => r.data),
+    api.get<UnallocatedTransactionResponse[]>("/transactions").then((r) => r.data),
 
   cashSale: (data: CashSaleRequest) =>
     api.post("/transactions/cash-sale", data).then((r) => r.data),
@@ -279,6 +300,8 @@ export const activityApi = {
 /* ─── Reports ─── */
 
 export const reportsApi = {
+  dashboard: () =>
+    api.get<DashboardResponse>("/reports/dashboard").then((r) => r.data),
   weekly: () =>
     api.get<WeeklyReportResponse>("/reports/weekly").then((r) => r.data),
 };

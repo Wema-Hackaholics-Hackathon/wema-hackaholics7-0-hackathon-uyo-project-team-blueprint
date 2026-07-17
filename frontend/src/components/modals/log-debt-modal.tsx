@@ -160,10 +160,10 @@ export function LogDebtModal({ open, onClose, onConfirm, inventory }: LogDebtMod
                 value={selectedProductId}
                 onValueChange={setSelectedProductId}
               >
-                <SelectTrigger className="h-9 flex-1 rounded-lg border-border bg-card text-[11px]">
+                <SelectTrigger className="h-9 w-full rounded-lg border-border bg-card text-[11px]">
                   <SelectValue placeholder="Select product…" />
                 </SelectTrigger>
-                  <SelectContent noPortal>
+                  <SelectContent>
                   {inventory.map((p) => (
                     <SelectItem key={p.id} value={String(p.id)}>
                       {p.name} — ₦{p.selling.toLocaleString()}

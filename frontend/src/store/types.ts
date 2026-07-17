@@ -52,4 +52,4 @@ export interface StagedProduct {
   img: string;
 }
 
-export type ModalId = "manual-cash" | "log-debt" | "incoming-transfer" | "settle-debt" | "collect-debt" | null;
+export type ModalId = "manual-cash" | "log-debt" | "incoming-transfer" | "settle-debt" | "collect-debt" | "edit-product" | null;

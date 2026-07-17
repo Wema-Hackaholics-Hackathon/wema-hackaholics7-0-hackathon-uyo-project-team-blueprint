@@ -3,6 +3,7 @@ import { LogDebtModal } from "./log-debt-modal";
 import { IncomingTransferModal } from "./incoming-transfer-modal";
 import { SettleDebtConfirmModal } from "./settle-debt-modal";
 import { CollectDebtDrawer } from "./collect-debt-drawer";
+import { EditProductDrawer } from "./edit-product-drawer";
 import { useApp } from "@/store/app-context";
 
 export function Modals() {
@@ -16,6 +17,7 @@ export function Modals() {
     settleDebt,
     settleTarget,
     collectTarget,
+    editTarget,
     incomingTransferAmount,
     incomingTransferSender,
     incomingTransferBank,
@@ -64,6 +66,11 @@ export function Modals() {
         accountNumber={accountNumber}
         accountName={accountName}
         onRemind={(title, message) => pushNotification(title, message, "credit")}
+      />
+      <EditProductDrawer
+        open={activeModal === "edit-product"}
+        onClose={closeModal}
+        target={editTarget}
       />
     </>
   );

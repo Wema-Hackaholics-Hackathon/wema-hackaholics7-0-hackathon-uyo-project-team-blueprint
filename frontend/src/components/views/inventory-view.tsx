@@ -5,6 +5,7 @@ import {
   Sparkle,
   Trash,
   CircleNotch,
+  PencilSimple,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { InventoryItem, StagedProduct } from "@/store/types";
@@ -21,6 +22,7 @@ interface InventoryViewProps {
   onUpdateStagedField: (idx: number, field: keyof StagedProduct, value: string | number) => void;
   onCommitBatch: () => void;
   onDiscardBatch: () => void;
+  onOpenEdit: (item: InventoryItem) => void;
 }
 
 export function InventoryView({
@@ -33,6 +35,7 @@ export function InventoryView({
   onUpdateStagedField,
   onCommitBatch,
   onDiscardBatch,
+  onOpenEdit,
 }: InventoryViewProps) {
   const staged = stagedProducts[activeStagedIdx];
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -196,15 +199,19 @@ export function InventoryView({
                     <span className="font-medium">
                       Retail: <span className="font-bold text-foreground">₦{item.selling}</span>
                     </span>
+                    <span className="font-medium">
+                      Margin: <span className="font-bold text-foreground">₦{item.selling - item.cost}</span>
+                    </span>
                   </div>
                 </div>
-                <div className="ml-3 shrink-0 text-right">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Margin
-                  </span>
-                  <p className="font-display text-lg font-black leading-tight text-foreground">
-                    ₦{item.selling - item.cost}
-                  </p>
+                <div className="ml-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onOpenEdit(item)}
+                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <PencilSimple weight="bold" className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             );
@@ -221,7 +228,7 @@ function Field({ label, value, onChange }: { label: string; value: number; onCha
       <label className="block text-[10px] font-bold uppercase text-muted-foreground">{label}</label>
       <Input
         type="number"
-        value={value}
+        value={value || ""}
         onChange={(e) => onChange(parseInt(e.target.value) || 0)}
         className="w-full rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground outline-none focus:border-primary"
       />

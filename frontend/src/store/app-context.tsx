@@ -3,7 +3,7 @@ import type { InventoryItem, DebtorEntry, DebtorItem, PaidDebt, Notification, St
 import { debtorsApi, inventoryApi, voiceApi, type AiLanguage } from "@/lib/endpoints";
 import { getErrorMessage } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
-import { useInventory, useDebtors, useWeeklyReport, useMe } from "@/lib/query-hooks";
+import { useInventory, useDebtors, useDashboard, useMe } from "@/lib/query-hooks";
 import { queryClient } from "@/lib/query-client";
 
 interface AppContextValue {
@@ -13,6 +13,9 @@ interface AppContextValue {
   bankName: string;
   revenue: number;
   profit: number;
+  totalDebt: number;
+  unpaidDebtorCount: number;
+  lowStockCount: number;
   inventory: InventoryItem[];
   debtors: DebtorEntry[];
   paidDebts: PaidDebt[];
@@ -29,6 +32,7 @@ interface AppContextValue {
   incomingTransferBank: string;
   settleTarget: DebtorEntry | null;
   collectTarget: DebtorEntry | null;
+  editTarget: InventoryItem | null;
   setAuthenticated: (v: boolean) => void;
   setActiveStagedIdx: (v: number) => void;
   setAiLang: (v: AiLanguage) => void;
@@ -44,6 +48,7 @@ interface AppContextValue {
   openSettleConfirm: (id: string) => void;
   openCollectDebt: (id: string) => void;
   openIncomingTransfer: () => void;
+  openEditProduct: (item: InventoryItem) => void;
   receiveIncomingTransfer: (payload: { amount: number; sender: string; bank: string }) => void;
   triggerBatchScan: (files: FileList | null) => void;
   addStagedProduct: (name?: string) => void;
@@ -65,7 +70,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const { data: meData, isError: meError } = useMe(authenticated);
   const { data: inventoryData } = useInventory(authenticated);
   const { data: debtorsData } = useDebtors(authenticated);
-  const { data: weeklyData } = useWeeklyReport(authenticated);
+  const { data: dashboardData } = useDashboard(authenticated);
 
   useEffect(() => {
     if (meError) setAuthenticated(false);
@@ -81,8 +86,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const accountName = meData?.business_name ?? "";
   const accountNumber = meData?.virtual_account_number ?? "";
   const bankName = "Wema Bank";
-  const revenue = weeklyData?.total_revenue ?? 0;
-  const profit = weeklyData?.total_profit ?? 0;
+  const revenue = dashboardData?.today_revenue ?? 0;
+  const profit = dashboardData?.today_profit ?? 0;
+  const totalDebt = dashboardData?.total_debt_outstanding ?? 0;
+  const unpaidDebtorCount = dashboardData?.unpaid_debtor_count ?? 0;
+  const lowStockCount = dashboardData?.low_stock_count ?? 0;
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [debtors, setDebtors] = useState<DebtorEntry[]>([]);
@@ -137,6 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [incomingTransferBank, setIncomingTransferBank] = useState("");
   const [settleTarget, setSettleTarget] = useState<DebtorEntry | null>(null);
   const [collectTarget, setCollectTarget] = useState<DebtorEntry | null>(null);
+  const [editTarget, setEditTarget] = useState<InventoryItem | null>(null);
 
   const pushNotification = useCallback((title: string, desc: string, _type: Notification["type"]) => {
     toast({ title, description: desc, variant: "default" as const });
@@ -202,7 +211,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const logDebt = useCallback(async (name: string, amount: number, date: string, items: DebtorItem[]) => {
     try {
-      await debtorsApi.create({
+      const created = await debtorsApi.create({
         name,
         amount,
         items_summary: items.map((i) => `${i.qty}× ${i.product_name}`).join(", "),
@@ -212,10 +221,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           price: i.price,
         })),
       });
+      setDebtors((prev) => [...prev, { id: created.id, name, amount, date, items }]);
     } catch (err) {
       toast({ title: "Debt Log Failed", description: getErrorMessage(err, "Could not save debt to server. Saved locally."), variant: "destructive" });
+      setDebtors((prev) => [...prev, { id: String(Date.now()), name, amount, date, items }]);
     }
-    setDebtors((prev) => [...prev, { id: String(Date.now()), name, amount, date, items }]);
     pushNotification("Credit Logged", `Logged ₦${amount} pending payment debt balance for ${name}.`, "credit");
   }, [pushNotification, toast]);
 
@@ -250,6 +260,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [debtors]);
 
+  const openEditProduct = useCallback((item: InventoryItem) => {
+    setEditTarget(item);
+    setActiveModal("edit-product");
+  }, []);
+
   const openIncomingTransfer = useCallback(() => {
     if (inventory.length === 0) return;
     const idx = Math.floor(Math.random() * inventory.length);
@@ -280,6 +295,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setIncomingTransferBank("");
     setSettleTarget(null);
     setCollectTarget(null);
+    setEditTarget(null);
   }, []);
 
   const triggerBatchScan = useCallback(async (_files: FileList | null) => {
@@ -430,16 +446,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       authenticated, accountName, accountNumber, bankName, revenue, profit,
+      totalDebt, unpaidDebtorCount, lowStockCount,
       inventory, debtors, paidDebts, stagedProducts,
       activeStagedIdx, scanning, chatLogs, aiChips, aiLang, aiLoading, activeModal,
       incomingTransferAmount, incomingTransferSender, incomingTransferBank,
-      settleTarget, collectTarget,
+      settleTarget, collectTarget, editTarget,
       setAuthenticated, setActiveStagedIdx, setAiLang, setActiveModal, closeModal,
       pushNotification, handleAuth, simulateTransfer, manualCashSale, processTransfer,
       logDebt, settleDebt, openSettleConfirm, openCollectDebt, openIncomingTransfer,
       receiveIncomingTransfer,
       triggerBatchScan, addStagedProduct, updateStagedField,
-      commitBatch, discardBatch, submitAiQuery, submitAiVoice,
+      commitBatch, discardBatch, openEditProduct,
+      submitAiQuery, submitAiVoice,
     }}>
       {children}
     </AppContext.Provider>

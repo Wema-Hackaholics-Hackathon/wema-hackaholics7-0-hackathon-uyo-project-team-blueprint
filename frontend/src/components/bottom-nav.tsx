@@ -1,9 +1,10 @@
-import { House, Package, BookOpen } from "@phosphor-icons/react";
+import { House, Package, BookOpen, ArrowsLeftRight } from "@phosphor-icons/react";
 import { Link, useLocation } from "@tanstack/react-router";
 
 const tabs = [
   { id: "dashboard", icon: House, label: "Home", to: "/dashboard" },
   { id: "inventory", icon: Package, label: "Stock", to: "/inventory" },
+  { id: "transactions", icon: ArrowsLeftRight, label: "History", to: "/transactions" },
   { id: "debtors", icon: BookOpen, label: "Debtors", to: "/debtors" },
 ] as const;
 
