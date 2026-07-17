@@ -81,8 +81,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const accountName = meData?.business_name ?? "";
   const accountNumber = meData?.virtual_account_number ?? "";
   const bankName = "Wema Bank";
-  const revenue = weeklyData?.total_revenue ?? 0;
-  const profit = weeklyData?.total_profit ?? 0;
+  const revenue = weeklyData?.revenue ?? 0;
+  const profit = weeklyData?.profit ?? 0;
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [debtors, setDebtors] = useState<DebtorEntry[]>([]);
