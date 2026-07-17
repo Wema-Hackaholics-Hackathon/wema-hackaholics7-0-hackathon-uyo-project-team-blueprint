@@ -134,10 +134,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [aiLang, setAiLang] = useState<AiLanguage>("en");
   const aiChips = useMemo<string[]>(() => {
     const map: Record<AiLanguage, string[]> = {
-      en: ["Who is owing me?", "Who paid last?", "Inventory Summary"],
-      yo: ["Ta l'o je mi?", "Ta l'o sanwon?", "Akojopo oja"],
-      ha: ["Wane ne yake bina?", "Wane ne ya biya?", "Takaitaccen kaya"],
-      pidgin: ["Who dey owe me?", "Who don pay?", "Inventory wey remain"],
+      en: ["Who is owing me?", "How much profit today?", "Inventory Summary"],
+      yo: ["Ta l'o je mi?", "Elo ni ere mi loni?", "Akojopo oja"],
+      ha: ["Wane ne yake bina?", "Nawa riba a yau?", "Takaitaccen kaya"],
+      pidgin: ["Who dey owe me?", "How much profit I make today?", "Inventory wey remain"],
     };
     return map[aiLang] ?? map.en;
   }, [aiLang]);
@@ -178,8 +178,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const { api } = await import("@/lib/api");
     try {
       await api.post("/transactions/cash-sale", {
-        product_id: String(prodId),
-        quantity: qty,
+        sender_name: "Cash",
+        items: [{ product_id: String(prodId), quantity: qty }],
       });
     } catch (err) {
       toast({ title: "Sale Failed", description: getErrorMessage(err, "Could not record cash sale with server. Saved locally."), variant: "destructive" });
@@ -198,8 +198,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const { api } = await import("@/lib/api");
     try {
       await api.post("/transactions/cash-sale", {
-        product_id: String(prodId),
-        quantity: qty,
+        sender_name: incomingTransferSender || "Transfer",
+        items: [{ product_id: String(prodId), quantity: qty }],
       });
     } catch (err) {
       toast({ title: "Transfer Failed", description: getErrorMessage(err, "Could not record transfer with server. Saved locally."), variant: "destructive" });
@@ -212,7 +212,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         i.id === prodId ? { ...i, qty: i.qty - qty } : i,
       );
     });
-  }, [pushNotification, toast]);
+  }, [incomingTransferSender, pushNotification, toast]);
 
   const logDebt = useCallback(async (name: string, amount: number, date: string, items: DebtorItem[]) => {
     try {
