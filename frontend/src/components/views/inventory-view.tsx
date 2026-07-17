@@ -221,7 +221,7 @@ function Field({ label, value, onChange }: { label: string; value: number; onCha
       <label className="block text-[10px] font-bold uppercase text-muted-foreground">{label}</label>
       <Input
         type="number"
-        value={value}
+        value={value || ""}
         onChange={(e) => onChange(parseInt(e.target.value) || 0)}
         className="w-full rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-foreground outline-none focus:border-primary"
       />
