@@ -23,12 +23,13 @@ function RootLayout() {
   const [reportsOpen, setReportsOpen] = useState(false);
 
   const isNotifPage = location.pathname === "/notifications";
+  const isLanding = location.pathname === "/";
 
   return (
     <div
       className={cn(
         "relative mx-auto flex min-h-screen w-full flex-col",
-        authenticated &&
+        !isLanding &&
           "max-w-[420px] border-x border-slate-100 bg-white shadow-md",
       )}
     >
