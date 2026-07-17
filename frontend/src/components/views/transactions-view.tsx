@@ -1,4 +1,4 @@
-import { ArrowsLeftRight, CurrencyNgn, CheckCircle, CircleNotch } from "@phosphor-icons/react";
+import { ArrowsLeftRight, CircleNotch } from "@phosphor-icons/react";
 import type { UnallocatedTransactionResponse } from "@/lib/endpoints";
 
 interface TransactionsViewProps {
