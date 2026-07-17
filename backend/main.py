@@ -12,6 +12,7 @@ from app.inventory.router import router as inventory_router
 from app.notifications.router import router as notifications_router
 from app.reports.router import router as reports_router
 from app.simulation.router import router as simulation_router
+from app.voice.router import router as voice_router
 from app.transactions.router import router as transactions_router
 from app.webhooks.router import router as webhooks_router
 
@@ -52,6 +53,7 @@ app.include_router(notifications_router)
 app.include_router(reports_router)
 app.include_router(webhooks_router)
 app.include_router(simulation_router)
+app.include_router(voice_router)
 
 
 @app.get("/")
