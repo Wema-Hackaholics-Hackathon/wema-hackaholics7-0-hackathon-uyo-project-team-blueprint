@@ -23,6 +23,7 @@ interface AppContextValue {
   activeStagedIdx: number;
   scanning: boolean;
   chatLogs: string[];
+  chatAudioUrls: Record<number, string>;
   aiChips: string[];
   aiLang: AiLanguage;
   aiLoading: boolean;
@@ -128,6 +129,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [activeStagedIdx, setActiveStagedIdx] = useState(0);
   const [scanning, setScanning] = useState(false);
   const [chatLogs, setChatLogs] = useState<string[]>([]);
+  const [chatAudioUrls, setChatAudioUrls] = useState<Record<number, string>>({});
+  const chatMsgCounterRef = useRef(0);
   const [aiLang, setAiLang] = useState<AiLanguage>("en");
   const aiChips = useMemo<string[]>(() => {
     const map: Record<AiLanguage, string[]> = {
@@ -413,6 +416,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const submitAiVoice = useCallback(async (audio: Blob) => {
     if (audio.size === 0) return;
+    const audioUrl = URL.createObjectURL(audio);
     setAiLoading(true);
     try {
       const productList = inventory.map((i) => `${i.name} (stock: ${i.qty}, price: ₦${i.selling})`).join("; ");
@@ -421,8 +425,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (productList) ctxParts.push(`Products in stock: ${productList}.`);
       if (debtorList) ctxParts.push(`Debtors: ${debtorList}.`);
       const context = ctxParts.length > 0 ? ctxParts.join(" ") : "";
+      const msgIdx = chatMsgCounterRef.current++;
+      setChatAudioUrls((prev) => ({ ...prev, [msgIdx]: audioUrl }));
+      setChatLogs((prev) => [...prev, "user:🎤"]);
       const res = await voiceApi.askVoice(audio, context);
-      setChatLogs((prev) => [...prev, `user:${res.transcript}`]);
       setChatLogs((prev) => [...prev, `bot:${res.reply}`]);
       const detected = res.language_detected as AiLanguage;
       if (["en", "yo", "ha", "pidgin"].includes(detected)) {
@@ -448,7 +454,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       authenticated, accountName, accountNumber, bankName, revenue, profit,
       totalDebt, unpaidDebtorCount, lowStockCount,
       inventory, debtors, paidDebts, stagedProducts,
-      activeStagedIdx, scanning, chatLogs, aiChips, aiLang, aiLoading, activeModal,
+      activeStagedIdx, scanning, chatLogs, chatAudioUrls, aiChips, aiLang, aiLoading, activeModal,
       incomingTransferAmount, incomingTransferSender, incomingTransferBank,
       settleTarget, collectTarget, editTarget,
       setAuthenticated, setActiveStagedIdx, setAiLang, setActiveModal, closeModal,

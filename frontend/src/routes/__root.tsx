@@ -15,7 +15,7 @@ import { playChime } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 
 function RootLayout() {
-  const { authenticated, setAuthenticated, aiLang, setAiLang, aiLoading, chatLogs, aiChips, submitAiQuery, submitAiVoice, receiveIncomingTransfer } = useApp();
+  const { authenticated, setAuthenticated, aiLang, setAiLang, aiLoading, chatLogs, chatAudioUrls, aiChips, submitAiQuery, submitAiVoice, receiveIncomingTransfer } = useApp();
   const { data: weeklyData } = useWeeklyReport();
   const { data: activityData } = useRecentActivity();
   const { toast } = useToast();
@@ -152,6 +152,7 @@ function RootLayout() {
             aiLoading={aiLoading}
             chips={aiChips}
             chatLogs={chatLogs}
+            chatAudioUrls={chatAudioUrls}
             onSubmitQuery={submitAiQuery}
             onSubmitVoice={submitAiVoice}
           />

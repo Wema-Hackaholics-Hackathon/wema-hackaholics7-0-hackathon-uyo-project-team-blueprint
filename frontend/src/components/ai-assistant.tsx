@@ -24,6 +24,7 @@ interface AiAssistantProps {
   aiLoading: boolean;
   chips: string[];
   chatLogs: string[];
+  chatAudioUrls?: Record<number, string>;
   onSubmitQuery: (text: string) => void;
   onSubmitVoice: (audio: Blob) => void;
 }
@@ -54,6 +55,7 @@ export function AiAssistant({
   const mediaRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const prevLogsLen = useRef(0);
+  const audioRefs = useRef<Record<number, HTMLAudioElement>>({});
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -188,11 +190,25 @@ export function AiAssistant({
               {chatLogs.map((log, i) => {
                 if (log.startsWith("user:")) {
                   const text = log.slice(5);
+                  const isAudio = text === "🎤";
+                  const audioUrl = chatAudioUrls?.[i];
                   return (
                     <div key={i} className="flex justify-end">
-                      <span className="inline-block max-w-[85%] rounded-2xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm">
-                        {text}
-                      </span>
+                      {isAudio && audioUrl ? (
+                        <div className="max-w-[85%] rounded-2xl bg-primary px-3 py-2 shadow-sm">
+                          <audio
+                            ref={(el) => { if (el) audioRefs.current[i] = el; }}
+                            src={audioUrl}
+                            controls
+                            className="h-8 max-w-[180px]"
+                            style={{ filter: "invert(1) brightness(2)" }}
+                          />
+                        </div>
+                      ) : (
+                        <span className="inline-block max-w-[85%] rounded-2xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm">
+                          {text}
+                        </span>
+                      )}
                     </div>
                   );
                 }
