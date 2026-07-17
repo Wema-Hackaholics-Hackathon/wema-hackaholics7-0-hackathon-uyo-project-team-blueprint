@@ -13,8 +13,8 @@ security = HTTPBearer()
 # Security configurations
 SECRET_KEY = "supersecretkey_please_change_in_production"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 3  # 3 days
+REFRESH_TOKEN_EXPIRE_DAYS = 60 * 24 * 3
 
 def get_pin_hash(pin: str) -> str:
     salt = bcrypt.gensalt()
