@@ -4,6 +4,7 @@ import {
   Checks,
   Sparkle,
   Trash,
+  CircleNotch,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { InventoryItem, StagedProduct } from "@/store/types";
@@ -14,6 +15,7 @@ interface InventoryViewProps {
   inventory: InventoryItem[];
   stagedProducts: StagedProduct[];
   activeStagedIdx: number;
+  scanning: boolean;
   onBatchScan: (files: FileList | null) => void;
   onSelectStaged: (idx: number) => void;
   onUpdateStagedField: (idx: number, field: keyof StagedProduct, value: string | number) => void;
@@ -25,6 +27,7 @@ export function InventoryView({
   inventory,
   stagedProducts,
   activeStagedIdx,
+  scanning,
   onBatchScan,
   onSelectStaged,
   onUpdateStagedField,
@@ -37,7 +40,7 @@ export function InventoryView({
   return (
     <div className="space-y-6 pb-20">
       <input
-        ref={fileInputRef}
+        id="scan-file-input" ref={fileInputRef}
         type="file"
         multiple
         accept="image/*"
@@ -55,9 +58,9 @@ export function InventoryView({
               </p>
             </div>
           </div>
-          <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-foreground px-5 py-3 text-xs font-bold text-background transition-all hover:opacity-90 active:scale-[0.97]">
-            <Camera weight="fill" className="h-4 w-4" />
-            <span>Scan Products</span>
+          <label htmlFor={scanning ? undefined : "scan-file-input"} className={cn("mt-4 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-bold transition-all", scanning ? "cursor-not-allowed bg-foreground/60 text-background/70" : "cursor-pointer bg-foreground text-background hover:opacity-90 active:scale-[0.97]")}>
+            {scanning ? <CircleNotch className="h-4 w-4 animate-spin" /> : <Camera weight="fill" className="h-4 w-4" />}
+            <span>{scanning ? "Scanning..." : "Scan Products"}</span>
           </label>
         </div>
       </div>

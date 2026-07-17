@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 interface DebtorsViewProps {
   debtors: DebtorEntry[];
   onOpenLogDebt: () => void;
-  onCollectDebt: (id: number) => void;
-  onMarkPaid: (id: number) => void;
+  onCollectDebt: (id: string) => void;
+  onMarkPaid: (id: string) => void;
 }
 
 export function DebtorsView({

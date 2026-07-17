@@ -60,10 +60,12 @@ function SelectContent({
   children,
   position = "item-aligned",
   align = "center",
+  noPortal,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+}: React.ComponentProps<typeof SelectPrimitive.Content> & { noPortal?: boolean }) {
+  const Wrapper = noPortal ? React.Fragment : SelectPrimitive.Portal;
   return (
-    <SelectPrimitive.Portal>
+    <Wrapper>
       <SelectPrimitive.Content
         data-slot="select-content"
         data-align-trigger={position === "item-aligned"}
@@ -84,7 +86,7 @@ function SelectContent({
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
-    </SelectPrimitive.Portal>
+    </Wrapper>
   )
 }
 

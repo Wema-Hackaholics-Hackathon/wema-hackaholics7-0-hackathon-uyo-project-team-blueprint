@@ -42,7 +42,7 @@ export function Modals() {
         open={activeModal === "manual-cash"}
         onClose={closeModal}
         inventory={inventory}
-        onConfirm={manualCashSale}
+        onConfirm={(basket) => { basket.forEach(({ prodId, qty }) => manualCashSale(prodId, qty)); }}
       />
       <LogDebtModal
         open={activeModal === "log-debt"}

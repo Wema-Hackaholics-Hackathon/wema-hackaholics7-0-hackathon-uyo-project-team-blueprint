@@ -1,7 +1,7 @@
 export type TabId = "dashboard" | "inventory" | "debtors";
 
 export interface InventoryItem {
-  id: number;
+  id: string;
   name: string;
   qty: number;
   cost: number;
@@ -15,7 +15,7 @@ export interface DebtorItem {
 }
 
 export interface DebtorEntry {
-  id: number;
+  id: string;
   name: string;
   amount: number;
   date: string;
@@ -24,7 +24,7 @@ export interface DebtorEntry {
 
 /** Transient basket item used in the Log Credit Sale form. */
 export interface CreditBasketItem {
-  inventoryId: number;
+  inventoryId: string;
   product_name: string;
   qty: number;
   unit_price: number;

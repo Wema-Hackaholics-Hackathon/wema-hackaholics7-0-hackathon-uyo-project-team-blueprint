@@ -1,14 +1,21 @@
 import { createRoute } from "@tanstack/react-router";
 import { Route as RootRoute } from "@/routes/__root";
-import { useApp } from "@/store/app-context";
+import { useRecentActivity } from "@/lib/query-hooks";
 import { NotificationsView } from "@/components/views/notifications-view";
 
 function NotificationsPage() {
-  const { notifications } = useApp();
+  const { data } = useRecentActivity();
+  const activities = (data ?? []).map((a) => ({
+    id: a.id,
+    title: a.title,
+    desc: a.description,
+    type: a.activity_type,
+    time: a.created_at,
+  }));
 
   return (
     <NotificationsView
-      notifications={notifications}
+      activities={activities}
       onClose={() => window.history.back()}
     />
   );

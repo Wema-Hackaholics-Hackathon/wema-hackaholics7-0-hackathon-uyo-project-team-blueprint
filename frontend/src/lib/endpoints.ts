@@ -56,8 +56,8 @@ export interface ProductUpdate {
 }
 
 export interface CashSaleRequest {
-  product_id: string;
-  quantity: number;
+  sender_name: string;
+  items: Array<{ product_id: string; quantity: number }>;
 }
 
 export interface DebtorCreate {
@@ -104,11 +104,10 @@ export interface DebtorsSummaryResponse {
 }
 
 export interface NotificationResponse {
-  id: string;
+  id: number;
   title: string;
   message: string;
-  type: string;
-  read: boolean;
+  is_read: boolean;
   created_at: string;
 }
 
@@ -162,7 +161,7 @@ export interface TriggerTransferPayload {
 }
 
 export interface ProductExtractionResponse {
-  name: string;
+  names: string[];
 }
 
 export interface BasketItem {
@@ -260,6 +259,23 @@ export const notificationsApi = {
     api.get<NotificationResponse[]>("/notifications").then((r) => r.data),
 };
 
+/* ─── Activity ─── */
+
+export interface ActivityResponse {
+  id: number;
+  account_id: string;
+  activity_type: string;
+  title: string;
+  description: string;
+  event_metadata: string;
+  created_at: string;
+}
+
+export const activityApi = {
+  recent: () =>
+    api.get<ActivityResponse[]>("/activity/recent").then((r) => r.data),
+};
+
 /* ─── Reports ─── */
 
 export const reportsApi = {
@@ -283,9 +299,10 @@ export const voiceApi = {
       .post<AdvisorResponse>("/voice/ask/text", { question, language })
       .then((r) => r.data),
 
-  askVoice: (audio: Blob) => {
+  askVoice: (audio: Blob, context?: string) => {
     const form = new FormData();
     form.append("audio", audio, "recording.webm");
+    if (context) form.append("context", context);
     return api
       .post<AdvisorResponse>("/voice/ask/voice", form, {
         headers: { "Content-Type": "multipart/form-data" },

@@ -14,7 +14,7 @@ interface SettleDebtConfirmModalProps {
   open: boolean;
   onClose: () => void;
   target: DebtorEntry | null;
-  onConfirm: (id: number) => void;
+  onConfirm: (id: string) => void;
 }
 
 export function SettleDebtConfirmModal({ open, onClose, target, onConfirm }: SettleDebtConfirmModalProps) {

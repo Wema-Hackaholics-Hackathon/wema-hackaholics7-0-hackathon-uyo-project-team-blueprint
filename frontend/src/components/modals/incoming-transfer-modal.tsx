@@ -28,7 +28,7 @@ import {
 import type { InventoryItem } from "@/store/types";
 
 interface BasketItem {
-  prodId: number;
+  prodId: string;
   qty: number;
 }
 
@@ -52,14 +52,14 @@ export function IncomingTransferModal({
   onConfirm,
 }: IncomingTransferModalProps) {
   const [basket, setBasket] = useState<BasketItem[]>([]);
-  const [prodId, setProdId] = useState(inventory[0]?.id ?? 0);
+  const [prodId, setProdId] = useState(inventory[0]?.id ?? "");
   const [qty, setQty] = useState(1);
   const [allowOvershoot, setAllowOvershoot] = useState(false);
 
   useEffect(() => {
     if (open) {
       setBasket([]);
-      setProdId(inventory[0]?.id ?? 0);
+      setProdId(inventory[0]?.id ?? "");
       setQty(1);
       setAllowOvershoot(false);
     }
@@ -92,11 +92,11 @@ export function IncomingTransferModal({
     });
   };
 
-  const removeFromBasket = (id: number) => {
+  const removeFromBasket = (id: string) => {
     setBasket((prev) => prev.filter((b) => b.prodId !== id));
   };
 
-  const updateBasketQty = (id: number, newQty: number) => {
+  const updateBasketQty = (id: string, newQty: number) => {
     if (newQty < 1) {
       removeFromBasket(id);
       return;
@@ -155,24 +155,27 @@ export function IncomingTransferModal({
             <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               Add Products to Sale Basket
             </h4>
-            <div className="flex items-end gap-2">
-              <div className="min-w-0 flex-1">
-                <Select
-                  value={String(prodId)}
-                  onValueChange={(v) => setProdId(parseInt(v))}
-                >
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Select product" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {inventory.map((i) => (
-                      <SelectItem key={i.id} value={String(i.id)}>
-                        {i.name} — ₦{i.selling.toLocaleString()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="min-w-0 flex-1">
+              <Select
+                value={prodId}
+                onValueChange={setProdId}
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Select product" />
+                </SelectTrigger>
+                <SelectContent noPortal>
+                  {inventory.map((i) => (
+                    <SelectItem key={i.id} value={i.id}>
+                      {i.name} — ₦{i.selling.toLocaleString()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); addToBasket(); }}
+              className="flex items-end gap-2"
+            >
               <div className="w-20">
                 <Input
                   type="number"
@@ -183,15 +186,14 @@ export function IncomingTransferModal({
                 />
               </div>
               <Button
-                type="button"
+                type="submit"
                 variant="default"
                 size="icon"
-                onClick={addToBasket}
                 className="h-10 w-10 shrink-0 cursor-pointer"
               >
                 <Plus weight="bold" className="h-4 w-4" />
               </Button>
-            </div>
+            </form>
           </div>
 
           {basket.length > 0 && (
