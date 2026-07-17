@@ -155,10 +155,17 @@ export interface DailySalesEntry {
 }
 
 export interface UnallocatedTransactionResponse {
-  id: string;
+  id: number;
+  reference: string | null;
+  sender_name: string | null;
   amount: number;
-  sender: string;
-  session_id: string;
+  channel: string | null;
+  status: string;
+  title: string | null;
+  details: string | null;
+  profit: number | null;
+  payment_method: string | null;
+  transaction_type: string | null;
   created_at: string;
 }
 
@@ -238,7 +245,7 @@ export const inventoryApi = {
 
 export const transactionsApi = {
   list: () =>
-    api.get<BasketItem[]>("/transactions").then((r) => r.data),
+    api.get<UnallocatedTransactionResponse[]>("/transactions").then((r) => r.data),
 
   cashSale: (data: CashSaleRequest) =>
     api.post("/transactions/cash-sale", data).then((r) => r.data),
