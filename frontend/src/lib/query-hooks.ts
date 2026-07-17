@@ -5,6 +5,7 @@ import {
   transactionsApi,
   debtorsApi,
   notificationsApi,
+  activityApi,
   reportsApi,
   type ProductCreate,
   type ProductUpdate,
@@ -23,6 +24,7 @@ export const queryKeys = {
   transactions: { all: ["transactions"] as const, unallocated: ["transactions", "unallocated"] as const },
   debtors: { all: ["debtors"] as const },
   notifications: { all: ["notifications"] as const },
+  activity: { recent: ["activity", "recent"] as const },
   reports: { weekly: ["reports", "weekly"] as const },
 };
 
@@ -42,10 +44,11 @@ export function useLogin() {
 
 /* ─── Inventory ─── */
 
-export function useInventory() {
+export function useInventory(enabled = true) {
   return useQuery({
     queryKey: queryKeys.inventory.all,
     queryFn: () => inventoryApi.list(),
+    enabled,
   });
 }
 
@@ -89,10 +92,11 @@ export function useExtractProduct() {
 
 /* ─── Transactions ─── */
 
-export function useTransactions() {
+export function useTransactions(enabled = true) {
   return useQuery({
     queryKey: queryKeys.transactions.all,
     queryFn: () => transactionsApi.list(),
+    enabled,
   });
 }
 
@@ -118,19 +122,21 @@ export function useTriggerTransfer() {
   });
 }
 
-export function useUnallocatedTransactions() {
+export function useUnallocatedTransactions(enabled = true) {
   return useQuery({
     queryKey: queryKeys.transactions.unallocated,
     queryFn: () => transactionsApi.unallocated(),
+    enabled,
   });
 }
 
 /* ─── Debtors ─── */
 
-export function useDebtors() {
+export function useDebtors(enabled = true) {
   return useQuery({
     queryKey: queryKeys.debtors.all,
     queryFn: () => debtorsApi.list(),
+    enabled,
   });
 }
 
@@ -153,19 +159,32 @@ export function useSettleDebtor() {
 
 /* ─── Notifications ─── */
 
-export function useNotifications() {
+export function useNotifications(enabled = true) {
   return useQuery({
     queryKey: queryKeys.notifications.all,
     queryFn: () => notificationsApi.list(),
+    enabled,
+    refetchInterval: 15_000,
+  });
+}
+
+/* ─── Activity ─── */
+
+export function useRecentActivity() {
+  return useQuery({
+    queryKey: queryKeys.activity.recent,
+    queryFn: () => activityApi.recent(),
+    refetchInterval: 15_000,
   });
 }
 
 /* ─── Reports ─── */
 
-export function useWeeklyReport() {
+export function useWeeklyReport(enabled = true) {
   return useQuery({
     queryKey: queryKeys.reports.weekly,
     queryFn: () => reportsApi.weekly(),
+    enabled,
   });
 }
 

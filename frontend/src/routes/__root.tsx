@@ -9,14 +9,15 @@ import { CreditModal } from "@/components/modals/credit-modal";
 import { ReportsDrawer } from "@/components/modals/reports-drawer";
 import { Modals } from "@/components/modals";
 import { useApp } from "@/store/app-context";
-import { useWeeklyReport } from "@/lib/query-hooks";
+import { useWeeklyReport, useRecentActivity } from "@/lib/query-hooks";
 import { useToast } from "@/components/ui/toast";
 import { playChime } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 
 function RootLayout() {
-  const { authenticated, notifications, aiLang, setAiLang, aiLoading, chatLogs, aiChips, submitAiQuery, submitAiVoice, receiveIncomingTransfer } = useApp();
+  const { authenticated, setAuthenticated, aiLang, setAiLang, aiLoading, chatLogs, aiChips, submitAiQuery, submitAiVoice, receiveIncomingTransfer } = useApp();
   const { data: weeklyData } = useWeeklyReport();
+  const { data: activityData } = useRecentActivity();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +29,16 @@ function RootLayout() {
   const isNotifPage = location.pathname === "/notifications";
   const isLanding = location.pathname === "/";
   const isSandbox = location.pathname === "/sandbox";
+
+  // Redirect to auth when the backend rejects the session token
+  useEffect(() => {
+    const onUnauthorized = () => {
+      setAuthenticated(false);
+      navigate({ to: "/auth", replace: true });
+    };
+    window.addEventListener("traka:unauthorized", onUnauthorized);
+    return () => window.removeEventListener("traka:unauthorized", onUnauthorized);
+  }, [navigate, setAuthenticated]);
 
   // Listen for demo "incoming transfer" broadcasts sent from the secret
   // /sandbox simulator so the merchant dashboard can react in real time.
@@ -62,7 +73,7 @@ function RootLayout() {
   return (
     <div
       className={cn(
-        "relative mx-auto flex min-h-screen w-full flex-col",
+        "relative mx-auto flex min-h-screen w-full flex-col overflow-clip",
         !isLanding &&
           "max-w-[420px] border-x border-slate-100 bg-white shadow-md",
       )}
@@ -98,9 +109,9 @@ function RootLayout() {
                 className="relative"
               >
                 <Bell weight="fill" className="h-5 w-5 text-muted-foreground" />
-                {notifications.length > 0 && (
+                {activityData && activityData.length > 0 && (
                   <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
-                    {notifications.length}
+                    {activityData.length}
                   </span>
                 )}
               </Button>

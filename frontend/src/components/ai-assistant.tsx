@@ -6,6 +6,7 @@ import {
   Microphone,
   CircleNotch,
   SpeakerHigh,
+  SpeakerSlash,
 } from "@phosphor-icons/react";
 import {
   Drawer,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/drawer";
 import { useToast } from "@/components/ui/toast";
 import type { AiLanguage } from "@/lib/endpoints";
+import { speakReply, cancelSpeech, ensureAudioReady } from "@/lib/tts";
 
 interface AiAssistantProps {
   open: boolean;
@@ -33,21 +35,6 @@ const LANGUAGES: { code: AiLanguage; label: string }[] = [
   { code: "ha", label: "Hausa" },
 ];
 
-const SPEECH_LANG: Record<AiLanguage, string> = {
-  en: "en-NG",
-  pidgin: "en-NG",
-  yo: "yo-NG",
-  ha: "ha-NG",
-};
-
-function speak(text: string, lang: AiLanguage) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = SPEECH_LANG[lang] ?? "en-NG";
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
-}
-
 export function AiAssistant({
   open,
   onClose,
@@ -62,9 +49,11 @@ export function AiAssistant({
   const { toast } = useToast();
   const [input, setInput] = useState("");
   const [recording, setRecording] = useState(false);
+  const [muted, setMuted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const prevLogsLen = useRef(0);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -73,15 +62,31 @@ export function AiAssistant({
   }, [chatLogs, aiLoading]);
 
   useEffect(() => {
+    if (open) ensureAudioReady();
+  }, [open]);
+
+  useEffect(() => {
     return () => {
       mediaRef.current?.state !== "inactive" && mediaRef.current?.stop();
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
+      cancelSpeech();
     };
   }, []);
 
+  useEffect(() => {
+    if (chatLogs.length <= prevLogsLen.current || muted) return;
+    const last = chatLogs[chatLogs.length - 1];
+    if (last?.startsWith("bot:")) {
+      const text = last.slice(4);
+      if (text && !text.includes("could not reach the advisor") && !text.includes("could not understand")) {
+        speakReply(text, aiLang);
+      }
+    }
+    prevLogsLen.current = chatLogs.length;
+  }, [chatLogs, aiLang, muted]);
+
   const startRecording = async () => {
+    ensureAudioReady();
+    cancelSpeech();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
@@ -114,6 +119,8 @@ export function AiAssistant({
 
   const handleSubmit = () => {
     if (!input.trim() || aiLoading) return;
+    ensureAudioReady();
+    cancelSpeech();
     onSubmitQuery(input);
     setInput("");
   };
@@ -137,13 +144,24 @@ export function AiAssistant({
               <MagicWand weight="fill" className="h-5 w-5 text-primary" />
               <span className="text-base font-bold text-slate-900">Traka Intelligent Assistant</span>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="cursor-pointer rounded-lg p-1.5 text-slate-600 transition-colors hover:bg-slate-100"
-            >
-              <X weight="bold" className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setMuted((m) => !m)}
+                className={`cursor-pointer rounded-lg p-1.5 transition-colors ${
+                  muted ? "text-slate-400" : "text-slate-600"
+                }`}
+              >
+                {muted ? <SpeakerSlash weight="bold" className="h-4 w-4" /> : <SpeakerHigh weight="bold" className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="cursor-pointer rounded-lg p-1.5 text-slate-600 transition-colors hover:bg-slate-100"
+              >
+                <X weight="bold" className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {/* ── Language pills ── */}
@@ -180,19 +198,11 @@ export function AiAssistant({
                 }
                 const text = log.startsWith("bot:") ? log.slice(4) : log;
                 return (
-                  <div key={i} className="flex items-end gap-1.5">
-                    <div className="max-w-[85%] rounded-2xl rounded-tl-none bg-slate-50 p-4 text-sm leading-relaxed text-slate-700 border border-slate-100/50 shadow-sm">
+                  <div key={i}>
+                    <div className="inline-block max-w-[85%] rounded-2xl rounded-tl-none bg-slate-50 p-4 text-sm leading-relaxed text-slate-700 border border-slate-100/50 shadow-sm">
                       <MagicWand weight="fill" className="mr-1.5 inline h-3.5 w-3.5 text-primary" />
                       {text}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => speak(text, aiLang)}
-                      aria-label="Read reply aloud"
-                      className="mb-1 shrink-0 cursor-pointer rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-primary"
-                    >
-                      <SpeakerHigh weight="fill" className="h-4 w-4" />
-                    </button>
                   </div>
                 );
               })}
